@@ -1,7 +1,29 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:linktr.ee)"
+      "WebFetch(domain:linktr.ee)",
+      "Bash(npm install)",
+      "Bash(npm run build)",
+      "Bash(npm info vite-plugin-ejs)",
+      "Bash(rm build.js)",
+      "Bash(rm -rf src/pages src/js)",
+      "Bash(npx vite build)",
+      "Bash(npm install -D glob)",
+      "Bash(npm install -D glob-all)",
+      "Bash(mkdir -p src/css src/js)",
+      "Bash(mv index.html music.html people.html player.html src/)",
+      "Bash(mv css/styles.css src/css/)",
+      "Bash(mv js/player.js src/js/)",
+      "Bash(rmdir css js)",
+      "Bash(mv data/site.json src/site.json)",
+      "Bash(rmdir data)",
+      "Bash(for f in *.wav)",
+      "Bash(do cmd.exe /c \"C:\\\\resources\\\\ffmp3.bat \"\"$f\"\"\")",
+      "Bash(done)",
+      "Bash(ls -la \"c:\\\\projects\\\\claycollectivemusic.com\\\\src\\\\media/Pour Out Your Spirit \\(2025\\)/stems/02 - Glory to the King/\")",
+      "Bash(ls -la \"c:\\\\projects\\\\claycollectivemusic.com\\\\src\\\\media/Pour Out Your Spirit \\(2025\\)/stems/04 - Pour Out Your Spirit \\(Acoustic\\)/\")",
+      "Bash(ls -la \"c:\\\\projects\\\\claycollectivemusic.com\\\\src\\\\media/Pour Out Your Spirit \\(2025\\)/tracks/\")",
+      "Bash(sed 's/.*\\\\.//')"
     ]
   }
 }

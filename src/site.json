@@ -1,0 +1,20 @@
+{
+  "name": "Clay Collective",
+  "tagline": "Worship music for the church and the region.",
+  "url": "https://claycollectivemusic.com",
+  "copyright": "2026 Clay Collective Music. All rights reserved.",
+  "merchUrl": "https://shop.tbsonlinestore.com/product-category/clay-collective/",
+  "socials": [
+    { "name": "Spotify", "url": "https://open.spotify.com/artist/7bCKg9hnVh06i8bz2xbuVS", "icon": "spotify" },
+    { "name": "Apple Music", "url": "https://music.apple.com/us/artist/clay-collective-music/1556818199", "icon": "apple-music" },
+    { "name": "YouTube", "url": "https://www.youtube.com/@ClayCollectiveMusic", "icon": "youtube" },
+    { "name": "Instagram", "url": "https://instagram.com/claycollectivemusic", "icon": "instagram" },
+    { "name": "Facebook", "url": "https://www.facebook.com/claycollectivemusic", "icon": "facebook" }
+  ],
+  "listen": [
+    { "name": "Spotify", "url": "https://open.spotify.com/artist/7bCKg9hnVh06i8bz2xbuVS", "icon": "spotify" },
+    { "name": "Apple Music", "url": "https://music.apple.com/us/artist/clay-collective-music/1556818199", "icon": "apple-music" },
+    { "name": "YouTube", "url": "https://www.youtube.com/@ClayCollectiveMusic", "icon": "youtube" },
+    { "name": "Amazon Music", "url": "https://music.amazon.com/artists/B08Y5SSY2F/clay-collective-music", "icon": "amazon-music" }
+  ]
+}

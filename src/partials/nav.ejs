@@ -1,0 +1,15 @@
+<nav class="site-nav">
+  <div class="container">
+    <a href="index.html" class="nav-logo">Clay Collective</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" onclick="this.classList.toggle('open'); document.getElementById('nav-menu').classList.toggle('open');">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-menu">
+      <li><a href="index.html"<% if (activePage === 'home') { %> class="active"<% } %>>Home</a></li>
+      <li><a href="people.html"<% if (activePage === 'people') { %> class="active"<% } %>>Our People</a></li>
+      <li><a href="music.html"<% if (activePage === 'music') { %> class="active"<% } %>>Music</a></li>
+      <li><a href="player.html"<% if (activePage === 'player') { %> class="active"<% } %>>Stems &amp; Player</a></li>
+      <li><a href="<%= site.merchUrl %>" target="_blank" rel="noopener" class="nav-external">Shop Merch &rarr;</a></li>
+    </ul>
+  </div>
+</nav>

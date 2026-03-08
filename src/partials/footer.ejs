@@ -1,0 +1,42 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Clay Collective</h3>
+        <p><%= site.tagline %></p>
+        <div class="social-links footer-socials">
+          <% site.socials.forEach(function(s) { %>
+          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><%- icon(s.icon, 18, 18) %></a>
+          <% }); %>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-links-group">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="music.html">Music &amp; Charts</a></li>
+            <li><a href="player.html">Stems &amp; Player</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>More</h4>
+          <ul>
+            <li><a href="people.html">Our People</a></li>
+            <li><a href="<%= site.merchUrl %>" target="_blank" rel="noopener">Shop Merch</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>Listen</h4>
+          <ul>
+            <% site.listen.forEach(function(l) { %>
+            <li><a href="<%= l.url %>" target="_blank" rel="noopener"><%= l.name %></a></li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <%= site.copyright %>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,13 @@
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title><%= title %></title>
+<meta name="description" content="<%= description %>" />
+<meta name="keywords" content="<%= keywords %>" />
+
+<meta property="og:title" content="<%= ogTitle || title %>" />
+<meta property="og:description" content="<%= ogDescription || description %>" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="<%= site.url %>/<%= canonical %>" />
+
+<link rel="canonical" href="<%= site.url %>/<%= canonical %>" />
+<link rel="stylesheet" href="/css/styles.css" />

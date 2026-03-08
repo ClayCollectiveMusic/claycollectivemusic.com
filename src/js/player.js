@@ -4,28 +4,22 @@
  * Uses the Web Audio API to load and play multiple stems simultaneously,
  * with per-track solo, mute, volume controls, and download links.
  *
- * CONFIGURATION:
- * Edit the SONGS object below to add your songs and stem URLs.
- * Each stem needs a `name`, `url` (for playback), and optional `downloadUrl`
- * (if different from url). Add a `zipUrl` for the "Download All" button.
+ * Song data is inlined into the page at build time via PLAYER_SONGS global.
+ * Songs with a non-empty `stems` array will appear in the player dropdown.
  */
 
-var SONGS = {
-  // Example song configuration — replace with real audio file URLs
-  // 'song-title-one': {
-  //   title: 'Song Title One',
-  //   zipUrl: 'audio/song1/all-stems.zip',
-  //   stems: [
-  //     { name: 'Lead Vocal',   url: 'audio/song1/lead-vocal.mp3',     downloadUrl: 'audio/song1/lead-vocal.wav' },
-  //     { name: 'BG Vocals',    url: 'audio/song1/bg-vocals.mp3',      downloadUrl: 'audio/song1/bg-vocals.wav' },
-  //     { name: 'Electric Gtr', url: 'audio/song1/electric-guitar.mp3', downloadUrl: 'audio/song1/electric-guitar.wav' },
-  //     { name: 'Acoustic Gtr', url: 'audio/song1/acoustic-guitar.mp3', downloadUrl: 'audio/song1/acoustic-guitar.wav' },
-  //     { name: 'Keys',         url: 'audio/song1/keys.mp3',           downloadUrl: 'audio/song1/keys.wav' },
-  //     { name: 'Bass',         url: 'audio/song1/bass.mp3',           downloadUrl: 'audio/song1/bass.wav' },
-  //     { name: 'Drums',        url: 'audio/song1/drums.mp3',          downloadUrl: 'audio/song1/drums.wav' },
-  //   ]
-  // },
-};
+// Build the SONGS object from the inlined data
+var SONGS = {};
+
+(window.PLAYER_SONGS || []).forEach(function(song) {
+  if (song.stems && song.stems.length > 0) {
+    SONGS[song.slug] = {
+      title: song.title,
+      zipUrl: song.zipUrl || '',
+      stems: song.stems
+    };
+  }
+});
 
 // --- State ---
 var audioCtx = null;
@@ -55,6 +49,14 @@ function init() {
   songSelect.addEventListener('change', onSongChange);
   playBtn.addEventListener('click', togglePlay);
   progressBar.addEventListener('click', onSeek);
+
+  // Auto-select song from URL query param (e.g. ?song=awe-and-wonder)
+  var params = new URLSearchParams(window.location.search);
+  var songParam = params.get('song');
+  if (songParam && SONGS[songParam]) {
+    songSelect.value = songParam;
+    onSongChange();
+  }
 }
 
 function populateSongSelect() {

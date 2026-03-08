@@ -388,6 +388,119 @@ main {
   gap: 6px;
 }
 
+/* --- Album Cards (Music Page) --- */
+.album-card {
+  display: flex;
+  gap: 32px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.album-art {
+  flex-shrink: 0;
+  width: 240px;
+}
+
+.album-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.album-info {
+  flex: 1;
+  padding: 24px 24px 24px 0;
+  min-width: 0;
+}
+
+.album-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.album-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.album-year {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.album-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.album-track-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.album-track-row:hover {
+  background-color: var(--color-bg);
+}
+
+.album-track-num {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.album-track-name {
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 0.95rem;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.album-track-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .album-card {
+    flex-direction: column;
+  }
+
+  .album-art {
+    width: 100%;
+    max-height: 240px;
+  }
+
+  .album-info {
+    padding: 20px;
+  }
+
+  .album-track-row {
+    flex-wrap: wrap;
+  }
+
+  .album-track-actions {
+    width: 100%;
+    padding-left: 36px;
+  }
+}
+
 /* --- Multitrack Player --- */
 .player-container {
   background-color: var(--color-surface);

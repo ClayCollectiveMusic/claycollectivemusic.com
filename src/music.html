@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head.ejs', {
+    title: 'Music | Clay Collective Music',
+    description: 'Browse the Clay Collective catalog. Download chord charts, listen to full tracks, and get MP3 downloads of our worship songs.',
+    keywords: 'Clay Collective, worship songs, chord charts, MP3 download, worship music catalog',
+    ogTitle: 'Music | Clay Collective Music',
+    ogDescription: 'Browse our catalog. Download chord charts, listen to full tracks, and get MP3 downloads.',
+    canonical: 'music.html'
+  }) %>
+</head>
+<body>
+
+  <%- include('partials/nav.ejs', { activePage: 'music' }) %>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Music</h1>
+        <p class="subtitle">Our full catalog of worship songs. Listen on your favorite platform, download MP3s, and grab stems for your worship team.</p>
+        <div class="accent-line"></div>
+      </div>
+    </section>
+
+    <% albums.forEach(function(album) { %>
+    <section class="section" id="<%= album.slug %>">
+      <div class="container">
+        <div class="album-card">
+          <% if (album.artUrl) { %>
+          <div class="album-art">
+            <img src="<%= album.artUrl %>" alt="<%= album.name %> album art" />
+          </div>
+          <% } %>
+          <div class="album-info">
+            <div class="album-header">
+              <h2><%= album.name %></h2>
+              <span class="album-year"><%= album.year %></span>
+            </div>
+
+            <div class="album-tracks">
+              <% album.tracks.forEach(function(track) { %>
+              <div class="album-track-row">
+                <span class="album-track-num"><%= String(track.num).padStart(2, '0') %></span>
+                <span class="album-track-name"><%= track.name %></span>
+                <div class="album-track-actions">
+                  <% if (track.stems.length > 0) { %>
+                  <a href="player.html?song=<%= track.slug %>" class="btn btn-outline btn-sm">Stem Player</a>
+                  <% } %>
+                  <% if (track.stemsLink) { %>
+                  <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Stems ZIP</a>
+                  <% } %>
+                  <a href="<%= track.mp3Url %>" download class="btn btn-primary btn-sm">MP3</a>
+                </div>
+              </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <% }); %>
+
+    <% if (albums.length === 0) { %>
+    <section class="section">
+      <div class="container text-center">
+        <p class="text-muted">No music available yet. Check back soon!</p>
+      </div>
+    </section>
+    <% } %>
+  </main>
+
+  <%- include('partials/footer.ejs') %>
+
+</body>
+</html>
