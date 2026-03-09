@@ -172,7 +172,7 @@ main {
 
 /* --- Hero Section --- */
 .hero {
-  padding: 80px 0;
+  padding: 48px 0;
   text-align: center;
   background: linear-gradient(180deg, var(--color-bg-alt) 0%, var(--color-bg) 100%);
 }
@@ -197,7 +197,7 @@ main {
 
 /* --- Section --- */
 .section {
-  padding: 64px 0;
+  padding: 40px 0;
 }
 
 .section-alt {
@@ -401,12 +401,15 @@ main {
 .album-art {
   flex-shrink: 0;
   width: 240px;
+  display: flex;
+  align-items: flex-start;
+  padding: 24px;
 }
 
 .album-art img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  border-radius: 4px;
 }
 
 .album-info {
@@ -441,15 +444,22 @@ main {
 
 .album-track-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 12px;
   border-radius: 4px;
   transition: background-color 0.15s ease;
 }
 
 .album-track-row:hover {
   background-color: var(--color-bg);
+}
+
+.album-track-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .album-track-num {
@@ -473,8 +483,52 @@ main {
 
 .album-track-actions {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   flex-shrink: 0;
+  align-items: center;
+}
+
+.track-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.track-action-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.track-action-btn[title="Listen on Spotify"] {
+  color: #1DB954;
+}
+
+.track-action-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  width: auto;
+  padding: 0 8px;
+  text-transform: lowercase;
+}
+
+.track-action-primary {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.track-action-primary:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  color: var(--color-bg);
 }
 
 @media (max-width: 768px) {
@@ -484,24 +538,152 @@ main {
 
   .album-art {
     width: 100%;
-    max-height: 240px;
+    padding: 20px 20px 0;
+    max-width: 280px;
+    margin: 0 auto;
   }
 
   .album-info {
     padding: 20px;
   }
 
-  .album-track-row {
+  .album-track-top {
     flex-wrap: wrap;
   }
 
   .album-track-actions {
     width: 100%;
-    padding-left: 36px;
+    padding-left: 40px;
+    margin-top: 4px;
   }
 }
 
-/* --- Multitrack Player --- */
+/* --- Music Page Inline Player --- */
+.music-play-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-text-muted);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.music-play-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.music-play-btn .icon-pause { display: none; }
+.music-play-btn .icon-play { display: block; }
+.album-track-row.is-playing .music-play-btn .icon-pause { display: block; }
+.album-track-row.is-playing .music-play-btn .icon-play { display: none; }
+.album-track-row.is-playing .music-play-btn {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.music-progress-bar {
+  width: 100%;
+  height: 32px;
+  cursor: pointer;
+  position: relative;
+  margin-top: 4px;
+  padding: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+  display: none;
+}
+
+.album-track-row.is-playing .music-progress-bar,
+.album-track-row.has-played .music-progress-bar {
+  display: block;
+}
+
+.music-progress-fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0%;
+  background-color: var(--color-accent);
+  transition: none;
+  z-index: 1;
+}
+
+/* --- Song Picker --- */
+.song-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.song-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 8px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  color: var(--color-text);
+  font-family: inherit;
+  text-align: left;
+}
+
+.song-item:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-surface-hover);
+}
+
+.song-item.active {
+  border-color: var(--color-accent);
+  background-color: rgba(78, 168, 181, 0.1);
+}
+
+.song-item-art {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.song-item-art-placeholder {
+  background-color: var(--color-bg);
+}
+
+.song-item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.song-item-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-item-album {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* --- Multitrack Player (DAW-style) --- */
 .player-container {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -509,143 +691,286 @@ main {
   padding: 24px;
 }
 
+/* Transport bar */
 .player-transport {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--color-border);
 }
 
-.player-transport .play-btn {
-  width: 48px;
-  height: 48px;
+.daw-play-btn {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background-color: var(--color-accent);
-  color: var(--color-bg);
+  background-color: transparent;
+  color: var(--color-white);
+  border: 2px solid var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  padding: 0;
+}
+
+.daw-play-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.daw-play-btn .icon-pause { display: none; }
+.daw-play-btn .icon-play { display: block; }
+.daw-play-btn.is-playing .icon-pause { display: block; }
+.daw-play-btn.is-playing .icon-play { display: none; }
+
+.player-time {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+
+/* Waveform area — holds all tracks + playhead */
+.daw-waveform-area {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Vertical playhead line */
+.daw-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background-color: rgba(255, 255, 255, 0.85);
+  z-index: 10;
+  pointer-events: none;
+  transition: none;
+}
+
+/* Time tooltip above playhead */
+.daw-playhead-time {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  transform: translateX(-50%);
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
+  z-index: 11;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Track list */
+.track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Group container */
+.track-group {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 6px 10px 8px;
+}
+
+/* Group header */
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.group-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.group-count {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  background-color: rgba(255, 255, 255, 0.06);
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.group-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.group-mute-btn,
+.group-solo-btn {
+  width: 22px;
+  height: 18px;
+  border-radius: 3px;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  transition: background-color 0.2s ease;
-  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.45);
+  padding: 0;
+  transition: all 0.15s ease;
+  font-size: 0.6rem;
+  font-weight: 700;
+  user-select: none;
 }
 
-.player-transport .play-btn:hover {
-  background-color: var(--color-accent-hover);
+.group-mute-btn:hover,
+.group-solo-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
 }
 
-.player-progress {
-  flex: 1;
-  height: 6px;
-  background-color: var(--color-bg);
-  border-radius: 3px;
-  cursor: pointer;
-  position: relative;
+.group-mute-btn.active {
+  background-color: #b33a2a;
+  color: #fff;
 }
 
-.player-progress-fill {
-  height: 100%;
-  background-color: var(--color-accent);
-  border-radius: 3px;
-  width: 0%;
-  transition: width 0.1s linear;
+.group-solo-btn.active {
+  background-color: #c4a83c;
+  color: #1a1a1a;
 }
 
-.player-time {
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-}
-
-.track-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
+/* Track row */
 .track-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background-color: var(--color-bg);
-  border-radius: 6px;
+  gap: 8px;
+  padding: 2px 0;
 }
 
-.track-row .track-name {
-  width: 120px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-white);
+/* Waveform canvas wrapper with overlaid label */
+.track-waveform {
+  flex: 1;
+  height: 32px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.track-waveform .track-label {
+  position: absolute;
+  top: 3px;
+  left: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 1;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.track-waveform canvas {
+  display: block;
+}
+
+/* Loading indicator on unloaded tracks — thin bottom bar driven by JS */
+.track-loading-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background-color: rgba(78, 168, 181, 0.6);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* Controls */
+.track-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   flex-shrink: 0;
 }
 
-.track-row .track-controls {
-  display: flex;
-  gap: 8px;
-}
-
-.track-row .track-controls button {
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
+/* Reaper-style mute/solo buttons */
+.track-btn-mute,
+.track-btn-solo {
+  width: 24px;
+  height: 20px;
   border-radius: 3px;
-  border: 1px solid var(--color-border);
-  background-color: transparent;
-  color: var(--color-text-muted);
+  border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
   transition: all 0.15s ease;
+  padding: 0;
+  user-select: none;
 }
 
-.track-row .track-controls button:hover {
-  border-color: var(--color-text);
-  color: var(--color-text);
+.track-btn-mute {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.track-row .track-controls button.active-solo {
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-bg);
-}
-
-.track-row .track-controls button.active-mute {
-  background-color: #c0392b;
-  border-color: #c0392b;
+.track-btn-mute:hover {
+  background-color: rgba(255, 255, 255, 0.2);
   color: var(--color-white);
 }
 
-.track-row .track-volume {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  background-color: var(--color-border);
-  border-radius: 2px;
-  outline: none;
+.track-btn-mute.active {
+  background-color: #b33a2a;
+  color: #fff;
 }
 
-.track-row .track-volume::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background-color: var(--color-accent);
-  cursor: pointer;
+.track-btn-solo {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.track-row .track-volume::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background-color: var(--color-accent);
-  cursor: pointer;
-  border: none;
+.track-btn-solo:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+}
+
+.track-btn-solo.active {
+  background-color: #c4a83c;
+  color: #1a1a1a;
+}
+
+/* Per-track download button */
+.track-download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+.track-download-btn:hover {
+  opacity: 1;
+  color: var(--color-white);
 }
 
 /* --- Footer --- */
@@ -766,47 +1091,9 @@ main {
   color: var(--color-accent);
 }
 
-/* --- Track Download Button --- */
-.track-row .track-download {
-  flex-shrink: 0;
-}
+/* (track-download buttons removed — DAW player uses Download All only) */
 
-.track-row .track-download a {
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 3px;
-  border: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  transition: all 0.15s ease;
-}
-
-.track-row .track-download a:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-/* --- Song Select --- */
-.song-select-wrapper label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.song-select-wrapper select {
-  background-color: var(--color-surface);
-  color: var(--color-white);
-  border: 1px solid var(--color-border);
-  padding: 10px 16px;
-  border-radius: 4px;
-  font-size: 1rem;
-  width: 100%;
-  max-width: 400px;
-  cursor: pointer;
-}
+/* (song-select-wrapper removed — replaced by .song-list / .song-item) */
 
 /* --- Utility --- */
 .text-center { text-align: center; }
@@ -828,8 +1115,8 @@ main {
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
 
-  .hero { padding: 48px 0; }
-  .section { padding: 40px 0; }
+  .hero { padding: 32px 0; }
+  .section { padding: 24px 0; }
 
   /* Mobile nav */
   .nav-toggle {
@@ -880,16 +1167,14 @@ main {
   }
 
   /* Player */
-  .track-row {
-    flex-wrap: wrap;
+  .track-waveform {
+    height: 28px;
   }
 
-  .track-row .track-name {
-    width: 100%;
-  }
-
-  .track-row .track-volume {
-    min-width: 100px;
+  .track-btn-mute,
+  .track-btn-solo {
+    width: 20px;
+    height: 18px;
   }
 
   /* Card grid */

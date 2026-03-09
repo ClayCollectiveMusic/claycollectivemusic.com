@@ -40,17 +40,38 @@
 
             <div class="album-tracks">
               <% album.tracks.forEach(function(track) { %>
-              <div class="album-track-row">
-                <span class="album-track-num"><%= String(track.num).padStart(2, '0') %></span>
-                <span class="album-track-name"><%= track.name %></span>
-                <div class="album-track-actions">
-                  <% if (track.stems.length > 0) { %>
-                  <a href="player.html?song=<%= track.slug %>" class="btn btn-outline btn-sm">Stem Player</a>
-                  <% } %>
-                  <% if (track.stemsLink) { %>
-                  <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Stems ZIP</a>
-                  <% } %>
-                  <a href="<%= track.mp3Url %>" download class="btn btn-primary btn-sm">MP3</a>
+              <div class="album-track-row" data-mp3="<%= track.mp3Url %>"<% if (track.masterUrl) { %> data-master-url="<%= track.masterUrl %>"<% } %>>
+                <div class="album-track-top">
+                  <button class="music-play-btn" aria-label="Play" title="Play">
+                    <svg class="icon-play" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    <svg class="icon-pause" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+                  <span class="album-track-num"><%= String(track.num).padStart(2, '0') %></span>
+                  <span class="album-track-name"><%= track.name %></span>
+                  <div class="album-track-actions">
+                    <% if (track.spotifyUrl) { %>
+                    <a href="<%= track.spotifyUrl %>" target="_blank" rel="noopener" class="track-action-btn" title="Listen on Spotify">
+                      <%- icon('spotify', 16, 16) %>
+                    </a>
+                    <% } %>
+                    <% if (track.stems.length > 0) { %>
+                    <a href="player.html?songName=<%= track.slug %>" class="track-action-btn" title="Stem Player">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V6h-2v12zm4-8v4h2v-4h-2z"/></svg>
+                    </a>
+                    <% } %>
+                    <% if (track.stemsLink) { %>
+                    <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" class="track-action-btn" title="Download Stems ZIP">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10l-4-4h3V9h2v3h3l-4 4z"/></svg>
+                    </a>
+                    <% } %>
+                    <% if (track.masterUrl) { %>
+                    <a href="<%= track.masterUrl %>" target="_blank" rel="noopener" class="track-action-btn track-action-label" title="Download WAV">.wav</a>
+                    <% } %>
+                    <a href="<%= track.mp3Url %>" download class="track-action-btn track-action-primary track-action-label" title="Download MP3">.mp3</a>
+                  </div>
+                </div>
+                <div class="music-progress-bar">
+                  <div class="music-progress-fill"></div>
                 </div>
               </div>
               <% }); %>
@@ -72,5 +93,6 @@
 
   <%- include('partials/footer.ejs') %>
 
+  <script type="module" src="/js/music-player.js"></script>
 </body>
 </html>

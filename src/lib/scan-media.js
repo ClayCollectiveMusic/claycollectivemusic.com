@@ -68,17 +68,33 @@ export function scanMedia(mediaDir) {
       const mp3Url = `/${trackBasePath}/${file}`;
 
       // Look up metadata from album.json
-      const metaTrack = (albumMeta.tracks || []).find(t => t.name === trackName);
-      const stemsLink = metaTrack?.stemsLink || null;
+      const metaTrack = (albumMeta.tracks || []).find(t => t.name.toLowerCase() === trackName.toLowerCase());
+      const stemsLink = metaTrack?.stemsUrl || metaTrack?.stemsLink || null;
+      const masterUrl = metaTrack?.masterUrl || null;
+      const spotifyUrl = metaTrack?.spotifyUrl || null;
 
-      // Find stems for this track
-      const stemsDir = path.join(albumPath, 'stems', `${trackMatch[0].replace('.mp3', '')}`);
-      // Try matching by the folder name pattern "NN - Track Name"
+      // Find stems for this track — try exact "NN - Track Name" match first,
+      // then fall back to any folder ending in "- Track Name" (handles mismatched numbers)
       const stemFolderName = `${trackMatch[1]} - ${trackName}`;
-      const stemFolderPath = path.join(albumPath, 'stems', stemFolderName);
+      const stemsBaseDir = path.join(albumPath, 'stems');
+      let resolvedStemFolder = null;
+
+      if (fs.existsSync(path.join(stemsBaseDir, stemFolderName))) {
+        resolvedStemFolder = stemFolderName;
+      } else if (fs.existsSync(stemsBaseDir)) {
+        // Search for a folder matching by track name with any number prefix
+        const stemDirs = fs.readdirSync(stemsBaseDir, { withFileTypes: true })
+          .filter(d => d.isDirectory())
+          .map(d => d.name);
+        resolvedStemFolder = stemDirs.find(d => {
+          const m = d.match(/^\d+\s*-\s*(.+)$/);
+          return m && m[1].trim() === trackName;
+        }) || null;
+      }
 
       let stems = [];
-      if (fs.existsSync(stemFolderPath)) {
+      if (resolvedStemFolder) {
+        const stemFolderPath = path.join(stemsBaseDir, resolvedStemFolder);
         const stemFiles = fastGlob.sync('*.mp3', { cwd: stemFolderPath }).sort();
         stems = stemFiles.map(sf => {
           // Parse "Song Name_INSTRUMENT.mp3" -> just the instrument part
@@ -86,7 +102,7 @@ export function scanMedia(mediaDir) {
           const stemName = stemMatch ? stemMatch[1] : sf.replace('.mp3', '');
           return {
             name: stemName,
-            url: `/media/${dirName}/stems/${stemFolderName}/${sf}`,
+            url: `/media/${dirName}/stems/${resolvedStemFolder}/${sf}`,
           };
         });
       }
@@ -97,15 +113,21 @@ export function scanMedia(mediaDir) {
         slug: trackSlug,
         mp3Url,
         stemsLink,
+        masterUrl,
+        spotifyUrl,
         stems,
       });
     }
 
     if (tracks.length === 0) continue;
 
+    // releaseDate from album.json, fall back to year from folder name
+    const releaseDate = albumMeta.releaseDate || `${year}-01-01`;
+
     albums.push({
       name: albumName,
       year,
+      releaseDate,
       slug,
       artUrl,
       dirName,
@@ -113,8 +135,8 @@ export function scanMedia(mediaDir) {
     });
   }
 
-  // Sort albums by year descending (newest first)
-  albums.sort((a, b) => b.year - a.year);
+  // Sort albums by releaseDate descending (newest first)
+  albums.sort((a, b) => b.releaseDate.localeCompare(a.releaseDate));
 
   return albums;
 }
@@ -144,7 +166,11 @@ export function generatePlayerData(albums) {
       songs.push({
         slug: track.slug,
         title,
+        albumName: album.name,
+        artUrl: album.artUrl || '',
         zipUrl: track.stemsLink || '',
+        stemsUrl: track.stemsLink || '',
+        spotifyUrl: track.spotifyUrl || '',
         stems: track.stems.map(s => ({
           name: s.name,
           url: s.url,

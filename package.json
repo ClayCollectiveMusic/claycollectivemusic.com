@@ -2,7 +2,7 @@
   "name": "claycollectivemusic.com",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "process-media": "tsx scripts/process-media.ts"
   },

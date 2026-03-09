@@ -28,7 +28,7 @@ function icon(name, w, h) {
   h = h || 24;
   const pathData = ICONS[name];
   if (!pathData) return '';
-  return '<svg viewBox="0 0 24 24" width="' + w + '" height="' + h + '">' + pathData + '</svg>';
+  return '<svg viewBox="0 0 24 24" width="' + w + '" height="' + h + '" fill="currentColor">' + pathData + '</svg>';
 }
 
 export default defineConfig({
@@ -50,6 +50,7 @@ export default defineConfig({
           server.ws.send({ type: 'full-reload' });
         };
         server.watcher.on('add', rescan);
+        server.watcher.on('change', rescan);
         server.watcher.on('unlink', rescan);
         server.watcher.on('unlinkDir', rescan);
         server.watcher.on('addDir', rescan);

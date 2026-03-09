@@ -23,7 +23,11 @@
       "Bash(ls -la \"c:\\\\projects\\\\claycollectivemusic.com\\\\src\\\\media/Pour Out Your Spirit \\(2025\\)/stems/02 - Glory to the King/\")",
       "Bash(ls -la \"c:\\\\projects\\\\claycollectivemusic.com\\\\src\\\\media/Pour Out Your Spirit \\(2025\\)/stems/04 - Pour Out Your Spirit \\(Acoustic\\)/\")",
       "Bash(ls -la \"c:\\\\projects\\\\claycollectivemusic.com\\\\src\\\\media/Pour Out Your Spirit \\(2025\\)/tracks/\")",
-      "Bash(sed 's/.*\\\\.//')"
+      "Bash(sed 's/.*\\\\.//')",
+      "Bash(find \"src/media/Pour Out Your Spirit \\(2025\\)/stems\" -type f -name \"*.mp3\")",
+      "Bash(node -c src/js/player.js)",
+      "Bash(ls -d \"/c/projects/claycollectivemusic.com/src/media/Pour Out Your Spirit \\(2025\\)/stems/\"*/)",
+      "Bash(cat \"/c/projects/claycollectivemusic.com/src/media/Pour Out Your Spirit \\(2025\\)/album.json\")"
     ]
   }
 }
