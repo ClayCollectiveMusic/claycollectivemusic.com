@@ -95,7 +95,9 @@ export function scanMedia(mediaDir) {
       let stems = [];
       if (resolvedStemFolder) {
         const stemFolderPath = path.join(stemsBaseDir, resolvedStemFolder);
-        const stemFiles = fastGlob.sync('*.mp3', { cwd: stemFolderPath }).sort();
+        const stemFiles = fastGlob.sync('*.mp3', { cwd: stemFolderPath }).sort((a, b) =>
+          a.localeCompare(b, undefined, { numeric: true })
+        );
         stems = stemFiles.map(sf => {
           // Parse "Song Name_INSTRUMENT.mp3" -> just the instrument part
           const stemMatch = sf.match(/^.+?_(.+)\.mp3$/);

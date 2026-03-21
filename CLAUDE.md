@@ -39,7 +39,7 @@ src/                        # Vite root
           SongName_INSTRUMENT.mp3
 
 scripts/
-  process-media.ts           # Converts .wav to .mp3 via ffmpeg, deletes originals
+  process-media.ts           # Creates missing album.json files, converts .wav to .mp3 via ffmpeg, deletes originals
 
 public/
   bg.png                     # Background image
@@ -80,7 +80,7 @@ src/site.json                # Global site config (name, tagline, social links, 
 ## Commands
 - `npm run dev` — Start Vite dev server (auto-opens browser)
 - `npm run build` — Build to `dist/`
-- `npm run process-media` — Convert .wav files to .mp3 (requires ffmpeg)
+- `npm run process-media` — Create missing album.json, convert .wav files to .mp3 (requires ffmpeg)
 
 ## Branches
 - `master` — main development branch
