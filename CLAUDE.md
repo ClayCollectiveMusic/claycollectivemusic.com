@@ -4,6 +4,7 @@
 A static website for Clay Collective, a worship music collective. The site showcases their music catalog, provides MP3 downloads, chord charts, and an interactive multitrack stem player.
 
 **Live site:** https://claycollectivemusic.com
+**Beta site:** https://beta.claycollectivemusic.com (deployed via GitHub Actions on push to master)
 
 ## Tech Stack
 - **Vite** — build tool and dev server (`npm run dev`, `npm run build`)
@@ -28,7 +29,7 @@ src/                        # Vite root
     head.ejs                 # <head> partial (meta, CSS link)
     nav.ejs                  # Navigation bar
     footer.ejs               # Site footer
-  media/                     # Music files (not committed — large binaries)
+  media/                     # Music files (committed to git)
     <Album Name> (<Year>)/
       folder.jpg             # Album art
       album.json             # Optional per-track metadata (stemsLink, etc.)
@@ -82,9 +83,15 @@ src/site.json                # Global site config (name, tagline, social links, 
 - `npm run build` — Build to `dist/`
 - `npm run process-media` — Create missing album.json, convert .wav files to .mp3 (requires ffmpeg)
 
+## Deployment
+- **Beta site** auto-deploys via GitHub Actions (`.github/workflows/deploy.yml`) on every push to `master`
+- Uses `actions/deploy-pages@v4` — builds with Vite, uploads full `dist/` as artifact
+- Custom domain `beta.claycollectivemusic.com` set via `public/CNAME`
+- DNS managed in Cloudflare (CNAME pointing to GitHub Pages)
+
 ## Branches
 - `master` — main development branch
-- `gh-pages` — deployed site (GitHub Pages)
+- `gh-pages` — deployed site (GitHub Pages, legacy)
 
 ## Design
 - Dark theme with teal accent (#4ea8b5)
