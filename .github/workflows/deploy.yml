@@ -28,7 +28,7 @@ jobs:
         if: github.ref_name == 'master'
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.BETA_PAT }}
+          personal_token: ${{ secrets.GH_PAGES_PAT }}
           external_repository: ClayCollectiveMusic/claycollectivemusic.com
           publish_branch: gh-pages
           publish_dir: dist
@@ -44,7 +44,7 @@ jobs:
         if: github.ref_name == 'beta'
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.BETA_PAT }}
+          personal_token: ${{ secrets.GH_PAGES_PAT }}
           external_repository: ClayCollectiveMusic/beta.claycollectivemusic.com
           publish_branch: gh-pages
           publish_dir: dist
