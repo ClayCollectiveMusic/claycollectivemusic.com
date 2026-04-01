@@ -16,7 +16,7 @@
  *   R2_PUBLIC_URL    (default: https://cdn.claycollectivemusic.com)
  */
 
-import { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, ListObjectsV2Command, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -102,35 +102,60 @@ async function push() {
   const r2Keys = await listR2Objects();
   console.log(`R2 has ${r2Keys.size} objects`);
 
+  // Build a lowercase -> actual key map for case-insensitive comparison
+  const r2KeysLower = new Map<string, string>();
+  for (const key of r2Keys) {
+    r2KeysLower.set(key.toLowerCase(), key);
+  }
+
   const localFiles = listLocalFiles();
   console.log(`Local has ${localFiles.length} files to consider\n`);
 
   let uploaded = 0;
+  let renamed = 0;
   let skipped = 0;
 
   for (const relPath of localFiles) {
     const r2Key = `media/${relPath.replace(/\\/g, '/')}`;
+    const r2KeyLower = r2Key.toLowerCase();
 
     if (r2Keys.has(r2Key)) {
+      // Exact match — already in R2
       skipped++;
       continue;
     }
 
+    const existingKey = r2KeysLower.get(r2KeyLower);
+    if (existingKey) {
+      // Case mismatch — rename by uploading with correct key and deleting old
+      const absPath = path.join(mediaDir, relPath);
+      const fileSize = fs.statSync(absPath).size;
+      console.log(`Renaming: ${existingKey} -> ${r2Key} (${(fileSize / 1024 / 1024).toFixed(1)} MB)`);
+      await client.send(new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: r2Key,
+        Body: fs.readFileSync(absPath),
+        ContentType: mimeType(relPath),
+      }));
+      await client.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: existingKey }));
+      renamed++;
+      continue;
+    }
+
+    // Not in R2 at all — upload
     const absPath = path.join(mediaDir, relPath);
     const fileSize = fs.statSync(absPath).size;
     console.log(`Uploading: ${r2Key} (${(fileSize / 1024 / 1024).toFixed(1)} MB)`);
-
     await client.send(new PutObjectCommand({
       Bucket: BUCKET,
       Key: r2Key,
       Body: fs.readFileSync(absPath),
       ContentType: mimeType(relPath),
     }));
-
     uploaded++;
   }
 
-  console.log(`\nDone. Uploaded: ${uploaded}, Skipped (already in R2): ${skipped}`);
+  console.log(`\nDone. Uploaded: ${uploaded}, Renamed: ${renamed}, Skipped (already in R2): ${skipped}`);
 }
 
 async function pull() {
