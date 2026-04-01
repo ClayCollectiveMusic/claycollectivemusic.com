@@ -12,6 +12,8 @@ import path from 'path';
 import fastGlob from 'fast-glob';
 
 export function scanMedia(mediaDir) {
+  if (!fs.existsSync(mediaDir)) return [];
+
   const albumDirs = fs.readdirSync(mediaDir, { withFileTypes: true })
     .filter(d => d.isDirectory())
     .map(d => d.name)
