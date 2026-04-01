@@ -7,55 +7,95 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const mediaDir = path.join(__dirname, '..', 'src', 'media');
 
-// Find all .wav files recursively
-const wavFiles = fastGlob.sync('**/*.wav', {
-    cwd: mediaDir,
-    absolute: true,
-});
-
-// Find all album directories and create album.json if missing
+// Find all album directories
 const albumDirs = fs.readdirSync(mediaDir, { withFileTypes: true })
     .filter(d => d.isDirectory() && /^.+?\s*\(\d{4}\)$/.test(d.name));
 
 for (const dir of albumDirs) {
     const albumPath = path.join(mediaDir, dir.name);
     const albumJsonPath = path.join(albumPath, 'album.json');
-
-    if (fs.existsSync(albumJsonPath)) continue;
-
     const match = dir.name.match(/^(.+?)\s*\((\d{4})\)$/);
     if (!match) continue;
-
-    const albumName = match[1].trim();
     const year = match[2];
 
-    // Discover tracks to prefill track entries
-    const tracksDir = path.join(albumPath, 'tracks');
-    const trackSource = fs.existsSync(tracksDir) ? tracksDir : albumPath;
-    const trackFiles = fastGlob.sync('*.{mp3,wav}', { cwd: trackSource }).sort();
+    // Create album.json if missing
+    if (!fs.existsSync(albumJsonPath)) {
+        const tracksDir = path.join(albumPath, 'tracks');
+        const trackSource = fs.existsSync(tracksDir) ? tracksDir : albumPath;
+        const trackFiles = fastGlob.sync('*.{mp3,wav}', { cwd: trackSource }).sort();
 
-    const tracks = trackFiles
-        .map(f => {
-            const m = f.match(/^\d+\s*-\s*(.+)\.(mp3|wav)$/);
-            return m ? m[1].trim() : null;
-        })
-        .filter((name, i, arr) => name && arr.indexOf(name) === i)
-        .map(name => ({
-            name,
-            stemsUrl: '',
-            masterUrl: '',
-            spotifyUrl: '',
-        }));
+        const tracks = trackFiles
+            .map(f => {
+                const m = f.match(/^\d+\s*-\s*(.+)\.(mp3|wav)$/);
+                return m ? m[1].trim() : null;
+            })
+            .filter((name, i, arr) => name && arr.indexOf(name) === i)
+            .map(name => ({
+                name,
+                stemsUrl: '',
+                masterUrl: '',
+                spotifyUrl: '',
+                stems: [],
+            }));
 
-    const albumJson = {
-        releaseDate: `${year}-01-01`,
-        tracks,
-    };
+        const albumJson = { releaseDate: `${year}-01-01`, tracks };
+        fs.writeFileSync(albumJsonPath, JSON.stringify(albumJson, null, 2) + '\n');
+        console.log(`Created album.json for: ${dir.name}`);
+    }
 
-    fs.writeFileSync(albumJsonPath, JSON.stringify(albumJson, null, 2) + '\n');
-    console.log(`Created album.json for: ${dir.name}`);
+    // Update stems arrays in album.json from what's on disk
+    const albumMeta = JSON.parse(fs.readFileSync(albumJsonPath, 'utf8'));
+    const stemsBaseDir = path.join(albumPath, 'stems');
+    let updated = false;
+
+    for (let i = 0; i < (albumMeta.tracks || []).length; i++) {
+        const track = albumMeta.tracks[i];
+        const trackNum = track.trackNum ?? (i + 1);
+        const trackNumStr = String(trackNum).padStart(2, '0');
+
+        // Find the stem folder for this track
+        let stemFolder: string | null = null;
+        const exactMatch = `${trackNumStr} - ${track.name}`;
+        if (fs.existsSync(path.join(stemsBaseDir, exactMatch))) {
+            stemFolder = exactMatch;
+        } else if (fs.existsSync(stemsBaseDir)) {
+            const stemDirs = fs.readdirSync(stemsBaseDir, { withFileTypes: true })
+                .filter(d => d.isDirectory())
+                .map(d => d.name);
+            stemFolder = stemDirs.find(d => {
+                const m = d.match(/^\d+\s*-\s*(.+)$/);
+                return m && m[1].trim().toLowerCase() === track.name.toLowerCase();
+            }) ?? null;
+        }
+
+        if (!stemFolder) continue;
+
+        const stemFiles = fastGlob.sync('*.mp3', {
+            cwd: path.join(stemsBaseDir, stemFolder)
+        }).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+        // Store objects with display name, actual filename, and folder name
+        const stemNames = stemFiles.map(sf => {
+            const m = sf.match(/^.+?_(.+)\.mp3$/);
+            return { name: m ? m[1] : sf.replace('.mp3', ''), file: sf, folder: stemFolder };
+        });
+
+        const existing = JSON.stringify(track.stems ?? []);
+        const incoming = JSON.stringify(stemNames);
+        if (existing !== incoming) {
+            albumMeta.tracks[i].stems = stemNames;
+            updated = true;
+        }
+    }
+
+    if (updated) {
+        fs.writeFileSync(albumJsonPath, JSON.stringify(albumMeta, null, 2) + '\n');
+        console.log(`Updated stems in album.json for: ${dir.name}`);
+    }
 }
 
+// Convert .wav files to .mp3
+const wavFiles = fastGlob.sync('**/*.wav', { cwd: mediaDir, absolute: true });
 console.log(`Found ${wavFiles.length} .wav files`);
 
 for (const wavFile of wavFiles) {
@@ -75,7 +115,6 @@ for (const wavFile of wavFiles) {
         }
     }
 
-    // Delete the .wav only if the .mp3 now exists
     if (fs.existsSync(mp3File)) {
         fs.unlinkSync(wavFile);
         console.log(`Deleted: ${path.basename(wavFile)}`);

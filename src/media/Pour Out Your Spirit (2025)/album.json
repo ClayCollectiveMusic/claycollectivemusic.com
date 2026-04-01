@@ -1,30 +1,426 @@
 {
-    "releaseDate": "2025-03-27",
-    "spotifyUrl": "https://open.spotify.com/album/1nl7XmdONXKvE2sqAjnFbP?si=tQuAHtUyRp6ml127phcvEQ",
-    "tracks": [
+  "releaseDate": "2025-03-27",
+  "spotifyUrl": "https://open.spotify.com/album/1nl7XmdONXKvE2sqAjnFbP?si=tQuAHtUyRp6ml127phcvEQ",
+  "tracks": [
+    {
+      "name": "Pour out Your Spirit",
+      "stemsUrl": "https://drive.google.com/file/d/1w2Fu9SXSt4Ul9jVU1sZ9DaUTpdeS0Mx5",
+      "masterUrl": "https://drive.google.com/file/d/1T2fLh2CaQ42O4xd6Y4uSTPPqanvm6Sox",
+      "spotifyUrl": "https://open.spotify.com/track/4CSbISlJXRzJGEAM6qhyMt?si=e7c8cd622e8841ed",
+      "stems": [
         {
-            "name": "Pour out Your Spirit",
-            "stemsUrl": "https://drive.google.com/file/d/1w2Fu9SXSt4Ul9jVU1sZ9DaUTpdeS0Mx5",
-            "masterUrl": "https://drive.google.com/file/d/1T2fLh2CaQ42O4xd6Y4uSTPPqanvm6Sox",
-            "spotifyUrl": "https://open.spotify.com/track/4CSbISlJXRzJGEAM6qhyMt?si=e7c8cd622e8841ed"
+          "name": "ACS GTR",
+          "file": "POYS_ACS GTR.mp3",
+          "folder": "01 - Pour out Your Spirit"
         },
         {
-            "name": "Awe and Wonder",
-            "stemsUrl": "https://drive.google.com/file/d/1BbRJGnBpuHD6U8if3vvcsh5d5KfOV1sI",
-            "masterUrl": "https://drive.google.com/file/d/1W3L59DQcHEQkl9VZnv3nKTNjp7whXPaf",
-            "spotifyUrl": "https://open.spotify.com/track/2NUlMF7w2iM3gR4S2Ro64N?si=c99ccc8f7fd04c11"
+          "name": "AD LIBS",
+          "file": "POYS_AD LIBS.mp3",
+          "folder": "01 - Pour out Your Spirit"
         },
         {
-            "name": "Glory to the King",
-            "stemsUrl": "https://drive.google.com/file/d/1vkxGfSnC02uHpCI2cGB6HuXxGoy--Nwe",
-            "masterUrl": "https://drive.google.com/file/d/1Ms8xePdxwUo0cTmBibQTVWa1RHbzIFhR",
-            "spotifyUrl": "https://open.spotify.com/track/5uSZ3t5ku8lyuMyEESNEXO?si=495abf23921943c4"
+          "name": "BASS GTR",
+          "file": "POYS_BASS GTR.mp3",
+          "folder": "01 - Pour out Your Spirit"
         },
         {
-            "name": "Pour out Your Spirit (Acoustic)",
-            "stemsUrl": "",
-            "masterUrl": "https://drive.google.com/file/d/1ZV1cxA785fXF5iGxx10nCOze7fLxquzC/view?usp=drive_link",
-            "spotifyUrl": "https://open.spotify.com/track/66GoaxYMXIgBs612gCy3nt?si=891501f185c1471b"
+          "name": "BGV 1",
+          "file": "POYS_BGV 1.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "BGV 2",
+          "file": "POYS_BGV 2.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "BGV 3",
+          "file": "POYS_BGV 3.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "BGV 4",
+          "file": "POYS_BGV 4.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "DRUMS",
+          "file": "POYS_DRUMS.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "E GTR 1",
+          "file": "POYS_E GTR 1.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "E GTR 2",
+          "file": "POYS_E GTR 2.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "E GTR 3",
+          "file": "POYS_E GTR 3.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "E GTR 4",
+          "file": "POYS_E GTR 4.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "E GTR 5",
+          "file": "POYS_E GTR 5.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "E GTR 6",
+          "file": "POYS_E GTR 6.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "E GTR 7",
+          "file": "POYS_E GTR 7.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "GANG VOX FX",
+          "file": "POYS_GANG VOX FX.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "GANG VOX",
+          "file": "POYS_GANG VOX.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "LEAD VOC",
+          "file": "POYS_LEAD VOC.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "OHHS",
+          "file": "POYS_OHHS.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "PAD",
+          "file": "POYS_PAD.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "PERC",
+          "file": "POYS_PERC.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "PIANO",
+          "file": "POYS_PIANO.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "SFX",
+          "file": "POYS_SFX.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "SYNTH 1",
+          "file": "POYS_SYNTH 1.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "SYNTH 2",
+          "file": "POYS_SYNTH 2.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "SYNTH BASS",
+          "file": "POYS_SYNTH BASS.mp3",
+          "folder": "01 - Pour out Your Spirit"
+        },
+        {
+          "name": "VOC DBLS",
+          "file": "POYS_VOC DBLS.mp3",
+          "folder": "01 - Pour out Your Spirit"
         }
-    ]
+      ]
+    },
+    {
+      "name": "Awe and Wonder",
+      "stemsUrl": "https://drive.google.com/file/d/1BbRJGnBpuHD6U8if3vvcsh5d5KfOV1sI",
+      "masterUrl": "https://drive.google.com/file/d/1W3L59DQcHEQkl9VZnv3nKTNjp7whXPaf",
+      "spotifyUrl": "https://open.spotify.com/track/2NUlMF7w2iM3gR4S2Ro64N?si=c99ccc8f7fd04c11",
+      "stems": [
+        {
+          "name": "ACS GTR",
+          "file": "Awe and Wonder_ACS GTR.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "BASS GTR",
+          "file": "Awe and Wonder_BASS GTR.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "BGV 1",
+          "file": "Awe and Wonder_BGV 1.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "DRUMS",
+          "file": "Awe and Wonder_DRUMS.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 1",
+          "file": "Awe and Wonder_E GTR 1.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 2",
+          "file": "Awe and Wonder_E GTR 2.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 3",
+          "file": "Awe and Wonder_E GTR 3.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 4",
+          "file": "Awe and Wonder_E GTR 4.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 5",
+          "file": "Awe and Wonder_E GTR 5.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 6",
+          "file": "Awe and Wonder_E GTR 6.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 7",
+          "file": "Awe and Wonder_E GTR 7.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 8",
+          "file": "Awe and Wonder_E GTR 8.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 9",
+          "file": "Awe and Wonder_E GTR 9.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 10",
+          "file": "Awe and Wonder_E GTR 10.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "E GTR 11",
+          "file": "Awe and Wonder_E GTR 11.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "LEAD VOC",
+          "file": "Awe and Wonder_LEAD VOC.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "PERC",
+          "file": "Awe and Wonder_PERC.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "PIANO",
+          "file": "Awe and Wonder_PIANO.mp3",
+          "folder": "02 - Awe and Wonder"
+        },
+        {
+          "name": "VOC FX",
+          "file": "Awe and Wonder_VOC FX.mp3",
+          "folder": "02 - Awe and Wonder"
+        }
+      ]
+    },
+    {
+      "name": "Glory to the King",
+      "stemsUrl": "https://drive.google.com/file/d/1vkxGfSnC02uHpCI2cGB6HuXxGoy--Nwe",
+      "masterUrl": "https://drive.google.com/file/d/1Ms8xePdxwUo0cTmBibQTVWa1RHbzIFhR",
+      "spotifyUrl": "https://open.spotify.com/track/5uSZ3t5ku8lyuMyEESNEXO?si=495abf23921943c4",
+      "stems": [
+        {
+          "name": "ACS GTR",
+          "file": "GTTK_ACS GTR.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "BASS GTR",
+          "file": "GTTK_BASS GTR.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "BGV 1",
+          "file": "GTTK_BGV 1.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "BGV 2",
+          "file": "GTTK_BGV 2.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "DRUMS",
+          "file": "GTTK_DRUMS.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "DULCI",
+          "file": "GTTK_DULCI.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 1",
+          "file": "GTTK_E GTR 1.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 2",
+          "file": "GTTK_E GTR 2.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 3",
+          "file": "GTTK_E GTR 3.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 4",
+          "file": "GTTK_E GTR 4.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 5",
+          "file": "GTTK_E GTR 5.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 6",
+          "file": "GTTK_E GTR 6.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 7",
+          "file": "GTTK_E GTR 7.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 8",
+          "file": "GTTK_E GTR 8.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 9",
+          "file": "GTTK_E GTR 9.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 10",
+          "file": "GTTK_E GTR 10.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 11",
+          "file": "GTTK_E GTR 11.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 12",
+          "file": "GTTK_E GTR 12.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 13",
+          "file": "GTTK_E GTR 13.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 14",
+          "file": "GTTK_E GTR 14.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "E GTR 15",
+          "file": "GTTK_E GTR 15.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "LEAD VOC",
+          "file": "GTTK_LEAD VOC.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "PAD 2",
+          "file": "GTTK_PAD 2.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "PAD",
+          "file": "GTTK_PAD.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "PERC",
+          "file": "GTTK_PERC.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "PIANO 2",
+          "file": "GTTK_PIANO 2.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "PIANO",
+          "file": "GTTK_PIANO.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "SYNTH 1",
+          "file": "GTTK_SYNTH 1.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "SYNTH 2",
+          "file": "GTTK_SYNTH 2.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "SYNTH 3",
+          "file": "GTTK_SYNTH 3.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "SYNTH BASS",
+          "file": "GTTK_SYNTH BASS.mp3",
+          "folder": "03 - Glory to the King"
+        },
+        {
+          "name": "VOX FX",
+          "file": "GTTK_VOX FX.mp3",
+          "folder": "03 - Glory to the King"
+        }
+      ]
+    },
+    {
+      "name": "Pour out Your Spirit (Acoustic)",
+      "stemsUrl": "",
+      "masterUrl": "https://drive.google.com/file/d/1ZV1cxA785fXF5iGxx10nCOze7fLxquzC/view?usp=drive_link",
+      "spotifyUrl": "https://open.spotify.com/track/66GoaxYMXIgBs612gCy3nt?si=891501f185c1471b"
+    }
+  ]
 }

@@ -6,7 +6,8 @@
     "build": "vite build",
     "process-media": "tsx scripts/process-media.ts",
     "r2:push": "tsx scripts/sync-r2.ts --push",
-    "r2:pull": "tsx scripts/sync-r2.ts --pull"
+    "r2:pull": "tsx scripts/sync-r2.ts --pull",
+    "media": "npm run r2:pull && npm run process-media && npm run r2:push"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.967.0",
