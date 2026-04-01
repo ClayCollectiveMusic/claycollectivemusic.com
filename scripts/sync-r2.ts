@@ -60,7 +60,7 @@ const client = new S3Client({
 });
 
 // Files to exclude from sync (stay in git only)
-const EXCLUDE_GLOBS = ['**/*.json', '**/*.jpg', '**/*.jpeg', '**/*.png', '**/*.wav'];
+const EXCLUDE_GLOBS = ['**/*.json', '**/*.wav'];
 
 async function listR2Objects(): Promise<Set<string>> {
   const keys = new Set<string>();
@@ -92,6 +92,8 @@ function mimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   if (ext === '.mp3') return 'audio/mpeg';
   if (ext === '.wav') return 'audio/wav';
+  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
+  if (ext === '.png') return 'image/png';
   return 'application/octet-stream';
 }
 

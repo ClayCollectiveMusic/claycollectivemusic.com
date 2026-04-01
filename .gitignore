@@ -1,4 +1,7 @@
 node_modules/
 dist/
-src/media/**/*.mp3
+src/media/**
+!src/media/
+!src/media/*/
+!src/media/**/album.json
 .env.local

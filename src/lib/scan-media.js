@@ -24,7 +24,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import fastGlob from 'fast-glob';
 
 const R2_BASE_URL = 'https://cdn.claycollectivemusic.com';
 
@@ -49,10 +48,8 @@ export function scanMedia(mediaDir) {
     const year = parseInt(match[2], 10);
     const slug = slugify(albumName);
 
-    // Album art (folder.jpg is committed to git)
-    const artFile = 'folder.jpg';
-    const hasArt = fs.existsSync(path.join(albumPath, artFile));
-    const artUrl = hasArt ? `/media/${dirName}/${artFile}` : null;
+    // Album art — served from R2
+    const artUrl = `${R2_BASE_URL}/media/${dirName}/folder.jpg`;
 
     // album.json is required — it's the source of truth for tracks
     const albumJsonPath = path.join(albumPath, 'album.json');
