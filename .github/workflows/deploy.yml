@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master, beta]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy to main site
+        if: github.ref_name == 'master'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.GH_PAGES_PAT }}
+          external_repository: ClayCollectiveMusic/claycollectivemusic.com
+          publish_branch: gh-pages
+          publish_dir: dist
+          cname: claycollectivemusic.com
+
+      - name: Block indexing on beta site
+        if: github.ref_name == 'beta'
+        run: |
+          echo "User-agent: *" > dist/robots.txt
+          echo "Disallow: /" >> dist/robots.txt
+
+      - name: Deploy to beta site
+        if: github.ref_name == 'beta'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.GH_PAGES_PAT }}
+          external_repository: ClayCollectiveMusic/beta.claycollectivemusic.com
+          publish_branch: gh-pages
+          publish_dir: dist
+          cname: beta.claycollectivemusic.com
