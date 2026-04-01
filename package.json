@@ -4,9 +4,13 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "process-media": "tsx scripts/process-media.ts"
+    "process-media": "tsx scripts/process-media.ts",
+    "r2:push": "tsx scripts/sync-r2.ts --push",
+    "r2:pull": "tsx scripts/sync-r2.ts --pull"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.967.0",
+    "@aws-sdk/lib-storage": "^3.967.0",
     "@types/node": "^25.3.5",
     "ejs": "^3.1.10",
     "fast-glob": "^3.3.3",

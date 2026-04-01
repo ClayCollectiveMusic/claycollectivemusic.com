@@ -1,0 +1,30 @@
+{
+    "releaseDate": "2025-03-27",
+    "spotifyUrl": "https://open.spotify.com/album/1nl7XmdONXKvE2sqAjnFbP?si=tQuAHtUyRp6ml127phcvEQ",
+    "tracks": [
+        {
+            "name": "Pour out Your Spirit",
+            "stemsUrl": "https://drive.google.com/file/d/1w2Fu9SXSt4Ul9jVU1sZ9DaUTpdeS0Mx5",
+            "masterUrl": "https://drive.google.com/file/d/1T2fLh2CaQ42O4xd6Y4uSTPPqanvm6Sox",
+            "spotifyUrl": "https://open.spotify.com/track/4CSbISlJXRzJGEAM6qhyMt?si=e7c8cd622e8841ed"
+        },
+        {
+            "name": "Awe and Wonder",
+            "stemsUrl": "https://drive.google.com/file/d/1BbRJGnBpuHD6U8if3vvcsh5d5KfOV1sI",
+            "masterUrl": "https://drive.google.com/file/d/1W3L59DQcHEQkl9VZnv3nKTNjp7whXPaf",
+            "spotifyUrl": "https://open.spotify.com/track/2NUlMF7w2iM3gR4S2Ro64N?si=c99ccc8f7fd04c11"
+        },
+        {
+            "name": "Glory to the King",
+            "stemsUrl": "https://drive.google.com/file/d/1vkxGfSnC02uHpCI2cGB6HuXxGoy--Nwe",
+            "masterUrl": "https://drive.google.com/file/d/1Ms8xePdxwUo0cTmBibQTVWa1RHbzIFhR",
+            "spotifyUrl": "https://open.spotify.com/track/5uSZ3t5ku8lyuMyEESNEXO?si=495abf23921943c4"
+        },
+        {
+            "name": "Pour out Your Spirit (Acoustic)",
+            "stemsUrl": "",
+            "masterUrl": "https://drive.google.com/file/d/1ZV1cxA785fXF5iGxx10nCOze7fLxquzC/view?usp=drive_link",
+            "spotifyUrl": "https://open.spotify.com/track/66GoaxYMXIgBs612gCy3nt?si=891501f185c1471b"
+        }
+    ]
+}

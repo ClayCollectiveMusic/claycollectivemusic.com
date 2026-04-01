@@ -1,3 +1,4 @@
 node_modules/
 dist/
-media
+src/media/**/*.mp3
+.env.local

@@ -11,6 +11,8 @@ import fs from 'fs';
 import path from 'path';
 import fastGlob from 'fast-glob';
 
+const R2_BASE_URL = 'https://cdn.claycollectivemusic.com';
+
 export function scanMedia(mediaDir) {
   if (!fs.existsSync(mediaDir)) return [];
 
@@ -67,7 +69,7 @@ export function scanMedia(mediaDir) {
       const trackNum = parseInt(trackMatch[1], 10);
       const trackName = trackMatch[2].trim();
       const trackSlug = slugify(trackName);
-      const mp3Url = `/${trackBasePath}/${file}`;
+      const mp3Url = `${R2_BASE_URL}/${trackBasePath}/${file}`;
 
       // Look up metadata from album.json
       const metaTrack = (albumMeta.tracks || []).find(t => t.name.toLowerCase() === trackName.toLowerCase());
@@ -106,7 +108,7 @@ export function scanMedia(mediaDir) {
           const stemName = stemMatch ? stemMatch[1] : sf.replace('.mp3', '');
           return {
             name: stemName,
-            url: `/media/${dirName}/stems/${resolvedStemFolder}/${sf}`,
+            url: `${R2_BASE_URL}/media/${dirName}/stems/${resolvedStemFolder}/${sf}`,
           };
         });
       }
