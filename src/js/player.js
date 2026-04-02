@@ -199,7 +199,7 @@ function init() {
 
   // Auto-select song from URL query param, or first song by default
   var params = new URLSearchParams(window.location.search);
-  var songParam = params.get('songName');
+  var songParam = params.get('song');
   var firstKey = Object.keys(SONGS)[0];
   if (songParam && SONGS[songParam]) {
     selectSong(songParam);
@@ -217,7 +217,7 @@ function selectSong(key) {
 
   // Update URL querystring without reloading
   var url = new URL(window.location);
-  url.searchParams.set('songName', key);
+  url.searchParams.set('song', key);
   history.replaceState(null, '', url);
 
   // If this song is already loaded, just switch to it
@@ -854,8 +854,6 @@ function renderTracks() {
       dlBtn.className = 'track-download-btn';
       dlBtn.href = track.downloadUrl;
       dlBtn.setAttribute('download', '');
-      dlBtn.setAttribute('target', '_blank');
-      dlBtn.setAttribute('rel', 'noopener');
       dlBtn.setAttribute('title', 'Download stem');
       dlBtn.innerHTML =
         '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">' +

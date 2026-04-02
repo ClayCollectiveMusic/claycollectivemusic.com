@@ -142,7 +142,7 @@ export function generatePlayerData(albums) {
         : `${track.name} — ${album.name}`;
 
       songs.push({
-        slug: track.slug,
+        slug: album.slug + '--' + track.slug,
         title,
         albumName: album.name,
         artUrl: album.artUrl || '',
