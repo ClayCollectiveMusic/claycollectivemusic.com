@@ -81,10 +81,23 @@ async function listR2Objects(): Promise<Set<string>> {
 }
 
 function listLocalFiles(): string[] {
-  return fastGlob.sync('**/*', {
+  const files = fastGlob.sync('**/*', {
     cwd: mediaDir,
     onlyFiles: true,
     ignore: EXCLUDE_GLOBS,
+  });
+
+  // On Windows, fast-glob may return paths with incorrect casing because NTFS is
+  // case-insensitive. Resolve each path to its true filesystem-reported case so
+  // that R2 keys always reflect the actual folder/file names on disk.
+  return files.map(relPath => {
+    const absPath = path.join(mediaDir, relPath);
+    try {
+      const realAbs = fs.realpathSync.native(absPath);
+      return path.relative(mediaDir, realAbs).replace(/\\/g, '/');
+    } catch {
+      return relPath.replace(/\\/g, '/');
+    }
   }).sort();
 }
 
@@ -116,7 +129,7 @@ async function push() {
   let skipped = 0;
 
   for (const relPath of localFiles) {
-    const r2Key = `media/${relPath.replace(/\\/g, '/')}`;
+    const r2Key = `media/${relPath}`;
     const r2KeyLower = r2Key.toLowerCase();
 
     if (r2Keys.has(r2Key)) {
