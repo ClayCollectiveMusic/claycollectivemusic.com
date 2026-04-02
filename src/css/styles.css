@@ -683,6 +683,19 @@ main {
   color: var(--color-text-muted);
 }
 
+/* --- Waveform unloaded state — blur fake waveforms, keep labels/controls sharp --- */
+.waveforms-unloaded canvas {
+  filter: blur(3px);
+  opacity: 0.5;
+}
+
+/* --- Transport size warning --- */
+.transport-size-warning {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-left: 8px;
+}
+
 /* --- Multitrack Player (DAW-style) --- */
 .player-container {
   background-color: var(--color-surface);
@@ -723,9 +736,16 @@ main {
 }
 
 .daw-play-btn .icon-pause { display: none; }
+.daw-play-btn .icon-loading { display: none; }
 .daw-play-btn .icon-play { display: block; }
 .daw-play-btn.is-playing .icon-pause { display: block; }
 .daw-play-btn.is-playing .icon-play { display: none; }
+.daw-play-btn.is-loading .icon-loading { display: block; animation: spin 0.8s linear infinite; }
+.daw-play-btn.is-loading .icon-play { display: none; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 .player-time {
   color: var(--color-text-muted);
@@ -898,7 +918,13 @@ main {
   pointer-events: none;
 }
 
-/* Overall loading progress bar at the top of the player */
+/* Transport inline progress */
+.transport-progress {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Overall loading progress bar */
 .player-progress-bar {
   position: relative;
   width: 100%;
@@ -906,7 +932,7 @@ main {
   background: rgba(255, 255, 255, 0.08);
   border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 .player-progress-fill {
   height: 100%;

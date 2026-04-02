@@ -83,6 +83,7 @@ export function scanMedia(mediaDir) {
       const stems = metaStems.map(stem => ({
         name: stem.name,
         url: `${R2_BASE_URL}/media/${dirName}/stems/${stem.folder || stemFolderName}/${stem.file}`,
+        fileSize: stem.fileSize || 0,
       }));
 
       tracks.push({
@@ -152,6 +153,7 @@ export function generatePlayerData(albums) {
           name: s.name,
           url: s.url,
           downloadUrl: s.url,
+          fileSize: s.fileSize || 0,
         })),
       });
     }

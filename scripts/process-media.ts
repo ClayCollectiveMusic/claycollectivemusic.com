@@ -83,7 +83,9 @@ for (const dir of albumDirs) {
 
         const stemNames = stemFiles.map(sf => {
             const m = sf.match(/^.+?_(.+)\.mp3$/);
-            return { name: m ? m[1] : sf.replace('.mp3', ''), file: sf, folder: stemFolder };
+            const fullPath = path.join(stemsBaseDir, stemFolder, sf);
+            const fileSize = fs.statSync(fullPath).size;
+            return { name: m ? m[1] : sf.replace('.mp3', ''), file: sf, folder: stemFolder, fileSize };
         });
 
         const existing = JSON.stringify(track.stems ?? []);

@@ -24,6 +24,13 @@ var SONGS = {};
   }
 });
 
+function formatBytes(bytes) {
+  if (!bytes) return null;
+  if (bytes >= 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+  if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(0) + ' MB';
+  return (bytes / 1024).toFixed(0) + ' KB';
+}
+
 // Spotify icon SVG (inline since this is client-side JS)
 var SPOTIFY_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>';
 
@@ -52,6 +59,10 @@ var audioCtx = null;
 var tracks = [];
 var currentSongKey = null;
 var isPlaying = false;
+var isLoading = false;
+var autoPlayWhenLoaded = false;
+var loadAbortController = null;
+var loadGeneration = 0;
 var startTime = 0;
 var pauseOffset = 0;
 var duration = 0;
@@ -81,6 +92,7 @@ var downloadAllBtn = document.getElementById('download-all-btn');
 var playhead = document.getElementById('playhead');
 var playheadTime = document.getElementById('playhead-time');
 var waveformArea = document.getElementById('waveform-area');
+var transportSizeWarning = document.getElementById('transport-size-warning');
 
 // --- Init ---
 function init() {
@@ -176,10 +188,9 @@ function init() {
     btnDragVisited = [];
   });
 
-  // Spacebar play/pause
+  // Spacebar play/pause (or trigger load if splash is showing)
   document.addEventListener('keydown', function (e) {
-    if (e.code === 'Space' && currentSongKey && tracks.length > 0) {
-      // Don't trigger if user is typing in an input/textarea
+    if (e.code === 'Space' && currentSongKey) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
       e.preventDefault();
       togglePlay();
@@ -203,14 +214,82 @@ function selectSong(key) {
   items.forEach(function (el) {
     el.classList.toggle('active', el.getAttribute('data-song') === key);
   });
-  currentSongKey = key;
 
   // Update URL querystring without reloading
   var url = new URL(window.location);
   url.searchParams.set('songName', key);
   history.replaceState(null, '', url);
 
-  onSongChange(key);
+  // If this song is already loaded, just switch to it
+  if (currentSongKey === key && tracks.length > 0) return;
+
+  // Stop any current playback/loading and reset
+  if (loadAbortController) { loadAbortController.abort(); loadAbortController = null; }
+  loadGeneration++;
+  isLoading = false;
+  autoPlayWhenLoaded = false;
+  stopPlayback();
+  currentSongKey = key;
+  tracks = [];
+  duration = 0;
+  pauseOffset = 0;
+  seekPct = 0;
+  playBtn.onclick = null;
+  transportSizeWarning.style.display = 'none';
+  waveformArea.classList.remove('waveforms-unloaded');
+  updatePlayBtnState();
+
+  var song = SONGS[key];
+  if (!song) return;
+
+  // Build placeholder tracks and show the player UI immediately
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  song.stems.forEach(function (stem) {
+    var gainNode = audioCtx.createGain();
+    gainNode.connect(audioCtx.destination);
+    tracks.push({
+      name: stem.name,
+      category: categorize(stem.name),
+      downloadUrl: stem.downloadUrl || stem.url,
+      buffer: null,
+      source: null,
+      gainNode: gainNode,
+      solo: false,
+      muted: false,
+      volume: 1,
+      peaks: null,
+      canvas: null,
+      loaded: false
+    });
+  });
+
+  playerEl.style.display = 'block';
+  overallProgressWrap.style.display = 'none';
+  downloadAllWrapper.style.display = 'none';
+  renderTracks();
+  updateTimeDisplay();
+  updatePlayhead(0);
+  renderAllFakeWaveforms();
+
+  // Show size warning and dim waveforms until loaded
+  var totalBytes = song.stems.reduce(function (sum, s) { return sum + (s.fileSize || 0); }, 0);
+  var sizeStr = totalBytes > 0 ? formatBytes(totalBytes) : null;
+
+  if (sizeStr) {
+    transportSizeWarning.textContent = 'Playing will download ~' + sizeStr;
+    transportSizeWarning.style.display = '';
+  }
+
+  waveformArea.classList.add('waveforms-unloaded');
+
+  playBtn.onclick = function () {
+    transportSizeWarning.style.display = 'none';
+    waveformArea.classList.remove('waveforms-unloaded');
+    playBtn.onclick = null;
+    onSongChange(key, true);
+  };
 }
 
 function buildSongList() {
@@ -292,6 +371,26 @@ function drawWaveform(canvas, peaks, playbackPct, rgb) {
   }
 }
 
+function drawFakeWaveform(canvas, rgb) {
+  var numSamples = 120;
+  var peaks = new Float32Array(numSamples);
+  // Generate smooth random peaks using a simple low-pass walk
+  var val = 0.4 + Math.random() * 0.3;
+  for (var i = 0; i < numSamples; i++) {
+    val = val * 0.75 + (0.2 + Math.random() * 0.7) * 0.25;
+    peaks[i] = val;
+  }
+  drawWaveform(canvas, peaks, 0, rgb);
+}
+
+function renderAllFakeWaveforms() {
+  tracks.forEach(function (track) {
+    if (track.canvas) {
+      drawFakeWaveform(track.canvas, getCategoryColor(track.category));
+    }
+  });
+}
+
 function renderAllWaveforms(pct) {
   tracks.forEach(function (track) {
     if (track.canvas && track.peaks) {
@@ -319,9 +418,7 @@ function updatePlayhead(pct) {
 }
 
 // --- Song Loading ---
-async function onSongChange(songKey) {
-  stopPlayback();
-
+async function onSongChange(songKey, autoPlay) {
   if (!songKey || !SONGS[songKey]) {
     playerEl.style.display = 'none';
     downloadAllWrapper.style.display = 'none';
@@ -332,32 +429,14 @@ async function onSongChange(songKey) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  var song = SONGS[songKey];
-  currentSongKey = songKey;
-  tracks = [];
-  duration = 0;
-  pauseOffset = 0;
-  seekPct = 0;
+  isLoading = true;
+  autoPlayWhenLoaded = !!autoPlay;
+  loadAbortController = new AbortController();
+  var signal = loadAbortController.signal;
+  var myGeneration = loadGeneration;
+  updatePlayBtnState();
 
-  // Build placeholder tracks immediately so the UI appears right away
-  song.stems.forEach(function (stem, i) {
-    var gainNode = audioCtx.createGain();
-    gainNode.connect(audioCtx.destination);
-    tracks.push({
-      name: stem.name,
-      category: categorize(stem.name),
-      downloadUrl: stem.downloadUrl || stem.url,
-      buffer: null,
-      source: null,
-      gainNode: gainNode,
-      solo: false,
-      muted: false,
-      volume: 1,
-      peaks: null,
-      canvas: null,
-      loaded: false
-    });
-  });
+  var song = SONGS[songKey];
 
   // Show download-all if zipUrl exists
   if (song.zipUrl) {
@@ -368,15 +447,18 @@ async function onSongChange(songKey) {
     downloadAllWrapper.style.display = 'none';
   }
 
+  // Clear fake waveforms — blank canvases until real ones arrive
+  tracks.forEach(function (track) {
+    if (track.canvas) {
+      var ctx = track.canvas.getContext('2d');
+      ctx.clearRect(0, 0, track.canvas.width, track.canvas.height);
+    }
+  });
+
   overallProgressWrap.style.display = 'block';
   overallProgressFill.style.width = '0%';
   overallProgressLabel.style.color = '';
   overallProgressLabel.textContent = 'Loading stems\u2026';
-  playerEl.style.display = 'block';
-
-  renderTracks();
-  updateTimeDisplay();
-  updatePlayhead(0);
 
   // Per-stem progress tracking
   // Each stem contributes two phases: download (weight 0.8) and decode+peaks (weight 0.2).
@@ -410,7 +492,7 @@ async function onSongChange(songKey) {
   var failedCount = 0;
   await Promise.allSettled(
     song.stems.map(function (stem, i) {
-      return fetch(stem.url)
+      return fetch(stem.url, { signal: signal })
         .then(function (r) {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           var contentLength = r.headers.get('Content-Length');
@@ -449,8 +531,7 @@ async function onSongChange(songKey) {
         })
         .then(function (buf) { return audioCtx.decodeAudioData(buf); })
         .then(function (buffer) {
-          // Bail if user switched songs while loading
-          if (currentSongKey !== songKey) return;
+          if (loadGeneration !== myGeneration) return;
           tracks[i].buffer = buffer;
           tracks[i].peaks = getPeaks(buffer, WAVEFORM_SAMPLES);
           stemDecoded[i] = true;
@@ -489,7 +570,7 @@ async function onSongChange(songKey) {
           }
         })
         .catch(function (err) {
-          if (currentSongKey !== songKey) return;
+          if (loadGeneration !== myGeneration) return;
           console.error('Failed to load stem "' + stem.name + '":', err);
           tracks[i].failed = true;
           failedCount++;
@@ -517,7 +598,14 @@ async function onSongChange(songKey) {
     })
   );
 
-  if (currentSongKey !== songKey) return;
+  if (loadGeneration !== myGeneration) return;
+
+  isLoading = false;
+  loadAbortController = null;
+  updatePlayBtnState();
+
+  if (signal.aborted) return;
+
   if (failedCount > 0 && loadedCount === 0) {
     overallProgressLabel.textContent = 'Failed to load stems. Please try again.';
     overallProgressLabel.style.color = 'var(--color-error, #e05c5c)';
@@ -527,6 +615,7 @@ async function onSongChange(songKey) {
   } else {
     overallProgressFill.style.width = '100%';
     overallProgressLabel.textContent = 'Ready';
+    if (autoPlayWhenLoaded) play();
     setTimeout(function () {
       if (currentSongKey === songKey) overallProgressWrap.style.display = 'none';
     }, 800);
@@ -536,11 +625,28 @@ async function onSongChange(songKey) {
 }
 
 // --- Playback ---
+function updatePlayBtnState() {
+  playBtn.classList.toggle('is-loading', isLoading);
+  playBtn.classList.toggle('is-playing', isPlaying);
+}
+
 function togglePlay() {
+  if (isLoading) {
+    // Still loading — toggle whether we'll auto-play when done
+    autoPlayWhenLoaded = !autoPlayWhenLoaded;
+    isLoading = autoPlayWhenLoaded;
+    updatePlayBtnState();
+    return;
+  }
   if (isPlaying) {
     pause();
   } else {
-    play();
+    // Pre-load state: clicking play starts loading
+    if (playBtn.onclick) {
+      playBtn.onclick();
+    } else {
+      play();
+    }
   }
 }
 
@@ -564,7 +670,7 @@ function play() {
 
   startTime = audioCtx.currentTime - pauseOffset;
   isPlaying = true;
-  playBtn.classList.add('is-playing');
+  updatePlayBtnState();
   updateGains();
   tick();
 
@@ -582,7 +688,7 @@ function pause() {
   pauseOffset = getCurrentTime();
   stopSources();
   isPlaying = false;
-  playBtn.classList.remove('is-playing');
+  updatePlayBtnState();
   cancelAnimationFrame(animFrameId);
 }
 
@@ -591,7 +697,7 @@ function stopPlayback() {
   isPlaying = false;
   pauseOffset = 0;
   seekPct = 0;
-  playBtn.classList.remove('is-playing');
+  updatePlayBtnState();
   cancelAnimationFrame(animFrameId);
   updateTimeDisplay();
   updatePlayhead(0);

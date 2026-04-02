@@ -40,8 +40,19 @@
               <svg class="icon-pause" viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
               </svg>
+              <svg class="icon-loading" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <circle cx="12" cy="12" r="9" stroke-opacity="0.25"/>
+                <path d="M12 3a9 9 0 0 1 9 9"/>
+              </svg>
             </button>
             <span class="player-time" id="time-display">0:00 / 0:00</span>
+            <span class="transport-size-warning" id="transport-size-warning" style="display:none;"></span>
+            <div class="transport-progress" id="overall-progress-wrap" style="display:none;">
+              <div class="player-progress-bar">
+                <div class="player-progress-fill" id="overall-progress-fill"></div>
+              </div>
+              <div class="player-progress-label" id="overall-progress-label">Loading stems&hellip;</div>
+            </div>
           </div>
 
           <!-- Waveform area (tracks + playhead) -->
