@@ -8,7 +8,7 @@
  * Pull: download files from R2 that don't exist locally (never deletes local files).
  *   tsx scripts/sync-r2.ts --pull
  *
- * Required env vars (put in .env.local or export before running):
+ *Required env vars (put in .env.local or export before running):
  *   R2_ACCOUNT_ID
  *   R2_ACCESS_KEY_ID
  *   R2_SECRET_ACCESS_KEY
@@ -110,6 +110,15 @@ function mimeType(filePath: string): string {
   return 'application/octet-stream';
 }
 
+function contentDisposition(filePath: string): string | undefined {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.mp3' || ext === '.wav') {
+    const fileName = path.basename(filePath);
+    return `attachment; filename="${fileName}"`;
+  }
+  return undefined;
+}
+
 async function push() {
   console.log('Listing R2 objects...');
   const r2Keys = await listR2Objects();
@@ -149,6 +158,7 @@ async function push() {
         Key: r2Key,
         Body: fs.readFileSync(absPath),
         ContentType: mimeType(relPath),
+        ContentDisposition: contentDisposition(relPath),
       }));
       await client.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: existingKey }));
       renamed++;
@@ -164,6 +174,7 @@ async function push() {
       Key: r2Key,
       Body: fs.readFileSync(absPath),
       ContentType: mimeType(relPath),
+      ContentDisposition: contentDisposition(relPath),
     }));
     uploaded++;
   }

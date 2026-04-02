@@ -69,6 +69,7 @@ src/site.json                # Global site config (name, tagline, social links, 
 - **Seeking**: clicking anywhere in the waveform area seeks to that position
 - **Transport bar**: circular outline play/pause button + time display
 - Per-track volume sliders and individual download links removed (Download All ZIP remains)
+- **Loading progress**: real byte-level download progress via `ReadableStream` — per-track bars + overall progress bar with label above the player; fades away on completion
 - URL param `?song=slug-name` auto-selects a song
 
 ### EJS Template Data

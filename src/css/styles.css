@@ -895,7 +895,44 @@ main {
   height: 2px;
   width: 0%;
   background-color: rgba(78, 168, 181, 0.6);
+  pointer-events: none;
+}
+
+/* Overall loading progress bar at the top of the player */
+.player-progress-bar {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.player-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-accent, #4ea8b5);
+  border-radius: 2px;
   transition: width 0.1s linear;
+}
+.player-progress-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+/* Error state for a stem that failed to load */
+.track-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-size: 11px;
+  color: #e05c5c;
+  background: rgba(224, 92, 92, 0.08);
   pointer-events: none;
 }
 

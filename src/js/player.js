@@ -70,7 +70,9 @@ function getCategoryColor(catKey) {
 // --- DOM ---
 var songListEl = document.getElementById('song-list');
 var playerEl = document.getElementById('player');
-var loadingMsg = document.getElementById('loading-msg');
+var overallProgressWrap = document.getElementById('overall-progress-wrap');
+var overallProgressFill = document.getElementById('overall-progress-fill');
+var overallProgressLabel = document.getElementById('overall-progress-label');
 var playBtn = document.getElementById('play-btn');
 var timeDisplay = document.getElementById('time-display');
 var trackListEl = document.getElementById('track-list');
@@ -366,86 +368,171 @@ async function onSongChange(songKey) {
     downloadAllWrapper.style.display = 'none';
   }
 
-  loadingMsg.style.display = 'block';
-  loadingMsg.textContent = 'Loading stems\u2026';
+  overallProgressWrap.style.display = 'block';
+  overallProgressFill.style.width = '0%';
+  overallProgressLabel.style.color = '';
+  overallProgressLabel.textContent = 'Loading stems\u2026';
   playerEl.style.display = 'block';
 
   renderTracks();
   updateTimeDisplay();
   updatePlayhead(0);
 
-  // Animate loading bars with a shared timer so they stay in sync
-  var loadAnimStart = performance.now();
-  var loadAnimId = setInterval(function () {
-    var elapsed = performance.now() - loadAnimStart;
-    var barPct = ((elapsed % 2000) / 2000) * 100; // 2s sweep cycle
-    var anyLoading = false;
-    tracks.forEach(function (track) {
-      if (track.loadingBar) {
-        track.loadingBar.style.width = barPct + '%';
-        anyLoading = true;
+  // Per-stem progress tracking
+  // Each stem contributes two phases: download (weight 0.8) and decode+peaks (weight 0.2).
+  // stemTotalBytes=0 means Content-Length unknown; we still track decode phase.
+  var stemTotalBytes = new Array(song.stems.length).fill(0);
+  var stemLoadedBytes = new Array(song.stems.length).fill(0);
+  var stemDecoded = new Array(song.stems.length).fill(false); // true once decode+peaks done (or failed)
+
+  function updateProgress() {
+    var n = song.stems.length;
+    // Download phase: use byte ratio when sizes are known, else count fully-downloaded stems
+    var totalBytes = 0, loadedBytes = 0, knownCount = 0;
+    for (var k = 0; k < n; k++) {
+      if (stemTotalBytes[k] > 0) {
+        totalBytes += stemTotalBytes[k];
+        loadedBytes += stemLoadedBytes[k];
+        knownCount++;
       }
-    });
-    if (!anyLoading) clearInterval(loadAnimId);
-  }, 30);
+    }
+    var downloadPct = knownCount > 0 ? loadedBytes / totalBytes : 0;
+    // Decode phase: fraction of stems fully decoded
+    var decodedCount = stemDecoded.filter(Boolean).length;
+    var decodePct = decodedCount / n;
+    // Combined: download = 80%, decode = 20%
+    var pct = (downloadPct * 0.8 + decodePct * 0.2) * 100;
+    overallProgressFill.style.width = pct + '%';
+  }
 
   // Load stems in parallel, updating waveforms as each arrives
   var loadedCount = 0;
-  try {
-    await Promise.all(
-      song.stems.map(function (stem, i) {
-        return fetch(stem.url)
-          .then(function (r) { return r.arrayBuffer(); })
-          .then(function (buf) { return audioCtx.decodeAudioData(buf); })
-          .then(function (buffer) {
-            // Bail if user switched songs while loading
-            if (currentSongKey !== songKey) return;
-            tracks[i].buffer = buffer;
-            tracks[i].peaks = getPeaks(buffer, WAVEFORM_SAMPLES);
-            tracks[i].loaded = true;
-            if (tracks[i].loadingBar) {
-              tracks[i].loadingBar.remove();
-              tracks[i].loadingBar = null;
-            }
-            // Update duration as stems load
-            var wasZero = duration === 0;
-            if (buffer.duration > duration) duration = buffer.duration;
-            // If this is the first stem to set duration, apply any pre-seek
-            if (wasZero && duration > 0 && seekPct > 0 && !isPlaying) {
-              pauseOffset = seekPct * duration;
-            }
-            loadedCount++;
-            loadingMsg.textContent = 'Loading stems\u2026 (' + loadedCount + '/' + song.stems.length + ')';
-            // Redraw this track's waveform
-            var pct = duration > 0 ? getCurrentTime() / duration : seekPct;
-            if (tracks[i].canvas) {
-              drawWaveform(tracks[i].canvas, tracks[i].peaks, pct, getCategoryColor(tracks[i].category));
-            }
-            updateTimeDisplay();
-            // If already playing, start this stem at the current position
-            if (isPlaying && !tracks[i].source) {
-              var offset = getCurrentTime();
-              if (offset < buffer.duration) {
-                var source = audioCtx.createBufferSource();
-                source.buffer = buffer;
-                source.connect(tracks[i].gainNode);
-                source.start(0, offset);
-                tracks[i].source = source;
-                updateGains();
+  var failedCount = 0;
+  await Promise.allSettled(
+    song.stems.map(function (stem, i) {
+      return fetch(stem.url)
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          var contentLength = r.headers.get('Content-Length');
+          stemTotalBytes[i] = contentLength ? parseInt(contentLength, 10) : 0;
+          // Stream the body so we can track download progress
+          var reader = r.body.getReader();
+          var chunks = [];
+          function pump() {
+            return reader.read().then(function (result) {
+              if (result.done) return chunks;
+              stemLoadedBytes[i] += result.value.length;
+              // Update this track's loading bar
+              if (tracks[i].loadingBar && stemTotalBytes[i] > 0) {
+                tracks[i].loadingBar.style.width = (stemLoadedBytes[i] / stemTotalBytes[i] * 100) + '%';
               }
+              updateProgress();
+              chunks.push(result.value);
+              return pump();
+            });
+          }
+          return pump().then(function (chunks) {
+            // Reassemble into ArrayBuffer
+            var totalLen = chunks.reduce(function (s, c) { return s + c.length; }, 0);
+            var combined = new Uint8Array(totalLen);
+            var offset = 0;
+            chunks.forEach(function (c) { combined.set(c, offset); offset += c.length; });
+            // Mark stem as fully downloaded
+            stemLoadedBytes[i] = stemTotalBytes[i] || totalLen;
+            stemTotalBytes[i] = stemTotalBytes[i] || totalLen;
+            if (tracks[i].loadingBar) {
+              tracks[i].loadingBar.style.width = '100%';
             }
+            updateProgress();
+            return combined.buffer;
           });
-      })
-    );
+        })
+        .then(function (buf) { return audioCtx.decodeAudioData(buf); })
+        .then(function (buffer) {
+          // Bail if user switched songs while loading
+          if (currentSongKey !== songKey) return;
+          tracks[i].buffer = buffer;
+          tracks[i].peaks = getPeaks(buffer, WAVEFORM_SAMPLES);
+          stemDecoded[i] = true;
+          updateProgress();
+          tracks[i].loaded = true;
+          if (tracks[i].loadingBar) {
+            tracks[i].loadingBar.remove();
+            tracks[i].loadingBar = null;
+          }
+          // Update duration as stems load
+          var wasZero = duration === 0;
+          if (buffer.duration > duration) duration = buffer.duration;
+          // If this is the first stem to set duration, apply any pre-seek
+          if (wasZero && duration > 0 && seekPct > 0 && !isPlaying) {
+            pauseOffset = seekPct * duration;
+          }
+          loadedCount++;
+          overallProgressLabel.textContent = 'Loading stems\u2026 (' + (loadedCount + failedCount) + '/' + song.stems.length + ')';
+          // Redraw this track's waveform
+          var pct = duration > 0 ? getCurrentTime() / duration : seekPct;
+          if (tracks[i].canvas) {
+            drawWaveform(tracks[i].canvas, tracks[i].peaks, pct, getCategoryColor(tracks[i].category));
+          }
+          updateTimeDisplay();
+          // If already playing, start this stem at the current position
+          if (isPlaying && !tracks[i].source) {
+            var offset = getCurrentTime();
+            if (offset < buffer.duration) {
+              var source = audioCtx.createBufferSource();
+              source.buffer = buffer;
+              source.connect(tracks[i].gainNode);
+              source.start(0, offset);
+              tracks[i].source = source;
+              updateGains();
+            }
+          }
+        })
+        .catch(function (err) {
+          if (currentSongKey !== songKey) return;
+          console.error('Failed to load stem "' + stem.name + '":', err);
+          tracks[i].failed = true;
+          failedCount++;
+          // Count failed stem as fully done so the overall bar isn't stuck
+          if (stemTotalBytes[i] === 0) stemTotalBytes[i] = 1;
+          stemLoadedBytes[i] = stemTotalBytes[i];
+          stemDecoded[i] = true;
+          updateProgress();
+          overallProgressLabel.textContent = 'Loading stems\u2026 (' + (loadedCount + failedCount) + '/' + song.stems.length + ')';
+          // Replace the loading bar with an error indicator
+          if (tracks[i].loadingBar) {
+            tracks[i].loadingBar.remove();
+            tracks[i].loadingBar = null;
+          }
+          if (tracks[i].canvas) {
+            var wrap = tracks[i].canvas.parentElement;
+            if (wrap) {
+              var errEl = document.createElement('div');
+              errEl.className = 'track-error';
+              errEl.textContent = 'Failed to load';
+              wrap.appendChild(errEl);
+            }
+          }
+        });
+    })
+  );
 
-    if (currentSongKey !== songKey) return;
-    loadingMsg.style.display = 'none';
-    updatePlayhead(0);
-    renderAllWaveforms(0);
-  } catch (err) {
-    loadingMsg.textContent = 'Error loading stems. Please try again.';
-    console.error('Failed to load stems:', err);
+  if (currentSongKey !== songKey) return;
+  if (failedCount > 0 && loadedCount === 0) {
+    overallProgressLabel.textContent = 'Failed to load stems. Please try again.';
+    overallProgressLabel.style.color = 'var(--color-error, #e05c5c)';
+  } else if (failedCount > 0) {
+    overallProgressLabel.textContent = failedCount + ' stem' + (failedCount > 1 ? 's' : '') + ' failed to load.';
+    overallProgressLabel.style.color = 'var(--color-error, #e05c5c)';
+  } else {
+    overallProgressFill.style.width = '100%';
+    overallProgressLabel.textContent = 'Ready';
+    setTimeout(function () {
+      if (currentSongKey === songKey) overallProgressWrap.style.display = 'none';
+    }, 800);
   }
+  updatePlayhead(0);
+  renderAllWaveforms(0);
 }
 
 // --- Playback ---
@@ -661,6 +748,8 @@ function renderTracks() {
       dlBtn.className = 'track-download-btn';
       dlBtn.href = track.downloadUrl;
       dlBtn.setAttribute('download', '');
+      dlBtn.setAttribute('target', '_blank');
+      dlBtn.setAttribute('rel', 'noopener');
       dlBtn.setAttribute('title', 'Download stem');
       dlBtn.innerHTML =
         '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">' +
