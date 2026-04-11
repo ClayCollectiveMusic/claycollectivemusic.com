@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "vite --host",
+    "start": "vite --host",
     "build": "vite build",
     "process-media": "tsx scripts/process-media.ts",
     "r2:push": "tsx scripts/sync-r2.ts --push",
