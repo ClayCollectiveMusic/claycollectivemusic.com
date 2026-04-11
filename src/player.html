@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <%- include('partials/head.ejs', {
+    data,
     title: 'Stems & Multitrack Player | Clay Collective Music',
     description: 'Download individual stems and use the interactive multitrack player for Clay Collective songs. Solo, mute, and mix stems right in your browser, then download the ones you need.',
     keywords: 'Clay Collective, stem downloads, multitrack player, worship stems, isolated tracks',
@@ -12,7 +13,7 @@
 </head>
 <body>
 
-  <%- include('partials/nav.ejs', { activePage: 'player' }) %>
+  <%- include('partials/nav.ejs', { data, activePage: 'player' }) %>
 
   <main>
     <section class="hero">
@@ -81,9 +82,9 @@
     </section>
   </main>
 
-  <%- include('partials/footer.ejs') %>
+  <%- include('partials/footer.ejs', { data }) %>
 
-  <script>var PLAYER_SONGS = <%- JSON.stringify(generatePlayerData(albums)) %>;</script>
+  <script>var PLAYER_SONGS = <%- JSON.stringify(data.generatePlayerData(data.albums)) %>;</script>
   <script type="module" src="/js/player.js"></script>
 </body>
 </html>

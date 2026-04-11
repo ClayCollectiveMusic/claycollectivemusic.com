@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <%- include('partials/head.ejs', {
+    data,
     title: 'Our Story | Clay Collective Music',
     description: 'How a simple desire to worship became a movement serving churches across the region. The story of Clay Collective.',
     keywords: 'Clay Collective, our story, worship collective, history',
@@ -76,7 +77,7 @@
 </head>
 <body>
 
-  <%- include('partials/nav.ejs', { activePage: 'people' }) %>
+  <%- include('partials/nav.ejs', { data, activePage: 'people' }) %>
 
   <main>
     <section class="hero">
@@ -121,7 +122,7 @@
     </section>
   </main>
 
-  <%- include('partials/footer.ejs') %>
+  <%- include('partials/footer.ejs', { data }) %>
 
 </body>
 </html>

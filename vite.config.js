@@ -5,12 +5,18 @@ import glob from 'glob-all';
 import fs from 'fs';
 import { scanMedia, generatePlayerData } from './src/lib/scan-media.js';
 
-// Load data
-let site = JSON.parse(fs.readFileSync('src/site.json', 'utf8'));
-
 // Scan media folders for albums, tracks, stems
 const mediaDir = resolve(__dirname, 'src/media');
-let albums = scanMedia(mediaDir);
+
+// Single data object passed to EJS — mutate in place to pick up changes in watch mode.
+// Also includes itself as `data` so templates can pass it through to EJS includes.
+const data = {
+  site: JSON.parse(fs.readFileSync('src/site.json', 'utf8')),
+  albums: scanMedia(mediaDir),
+  icon,
+  generatePlayerData,
+};
+data.data = data;
 
 
 // SVG icon helper — defined here because SVG path data contains '<' which breaks EJS parsing in .ejs files
@@ -34,11 +40,8 @@ function icon(name, w, h) {
 export default defineConfig({
   root: 'src',
   plugins: [
-    ViteEjsPlugin({
-      site,
-      icon,
-      albums,
-      generatePlayerData,
+    ViteEjsPlugin(data, {
+      ejs: { }
     }),
     {
       name: 'media-watcher',
@@ -48,9 +51,7 @@ export default defineConfig({
         server.watcher.add(siteJsonPath);
         server.watcher.on('change', (file) => {
           if (file === siteJsonPath) {
-            const updated = JSON.parse(fs.readFileSync(siteJsonPath, 'utf8'));
-            for (const key of Object.keys(site)) delete site[key];
-            Object.assign(site, updated);
+            data.site = JSON.parse(fs.readFileSync(siteJsonPath, 'utf8'));
             server.ws.send({ type: 'full-reload' });
           }
         });
@@ -58,7 +59,7 @@ export default defineConfig({
         // Watch the media directory for new/changed/deleted files
         server.watcher.add(mediaDir);
         const rescan = () => {
-          albums = scanMedia(mediaDir);
+          data.albums = scanMedia(mediaDir);
           server.ws.send({ type: 'full-reload' });
         };
         server.watcher.on('add', rescan);

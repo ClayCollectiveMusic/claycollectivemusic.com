@@ -3,10 +3,10 @@
     <div class="footer-content">
       <div class="footer-brand">
         <h3>Clay Collective</h3>
-        <p><%= site.tagline %></p>
+        <p><%= data.site.tagline %></p>
         <div class="social-links footer-socials">
-          <% site.socials.forEach(function(s) { %>
-          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><%- icon(s.icon, 18, 18) %></a>
+          <% data.site.socials.forEach(function(s) { %>
+          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><%- data.icon(s.icon, 18, 18) %></a>
           <% }); %>
         </div>
       </div>
@@ -22,13 +22,13 @@
           <h4>More</h4>
           <ul>
             <li><a href="story.html">Our Story</a></li>
-            <li><a href="<%= site.merchUrl %>" target="_blank" rel="noopener">Shop Merch</a></li>
+            <li><a href="<%= data.site.merchUrl %>" target="_blank" rel="noopener">Shop Merch</a></li>
           </ul>
         </div>
         <div class="footer-links-group">
           <h4>Listen</h4>
           <ul>
-            <% site.listen.forEach(function(l) { %>
+            <% data.site.listen.forEach(function(l) { %>
             <li><a href="<%= l.url %>" target="_blank" rel="noopener"><%= l.name %></a></li>
             <% }); %>
           </ul>
@@ -36,7 +36,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; <%= site.copyright.replace(/\d\d\d\d/, new Date().getFullYear()) %>
+      &copy; <%= data.site.copyright.replace(/\d\d\d\d/, new Date().getFullYear()) %>
     </div>
   </div>
 </footer>

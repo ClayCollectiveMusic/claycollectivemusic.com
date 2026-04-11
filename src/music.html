@@ -3,19 +3,19 @@
 
 <head>
   <%- include('partials/head.ejs', {
-      title: 'Music | Clay Collective Music' ,
-      description: 'Browse the Clay Collective catalog. Download chord charts, listen to full tracks, and get MP3 downloads of our worship songs.'
-      ,
-      keywords: 'Clay Collective, worship songs, chord charts, MP3 download, worship music catalog' ,
-      ogTitle: 'Music | Clay Collective Music' ,
-      ogDescription: 'Browse our catalog. Download chord charts, listen to full tracks, and get MP3 downloads.' ,
+      data,
+      title: 'Music | Clay Collective Music',
+      description: 'Browse the Clay Collective catalog. Download chord charts, listen to full tracks, and get MP3 downloads of our worship songs.',
+      keywords: 'Clay Collective, worship songs, chord charts, MP3 download, worship music catalog',
+      ogTitle: 'Music | Clay Collective Music',
+      ogDescription: 'Browse our catalog. Download chord charts, listen to full tracks, and get MP3 downloads.',
       canonical: 'music.html'
       }) %>
 </head>
 
 <body>
 
-  <%- include('partials/nav.ejs', { activePage: 'music' }) %>
+  <%- include('partials/nav.ejs', { data, activePage: 'music' }) %>
 
     <main>
       <section class="hero">
@@ -25,7 +25,7 @@
         </div>
       </section>
 
-      <% albums.forEach(function(album) { %>
+      <% data.albums.forEach(function(album) { %>
         <section class="section" id="<%= album.slug %>">
           <div class="container">
             <div class="album-card">
@@ -68,7 +68,7 @@
                                   <% if (track.spotifyUrl) { %>
                                     <a href="<%= track.spotifyUrl %>" target="_blank" rel="noopener"
                                        class="track-action-btn" title="Listen on Spotify">
-                                      <%- icon('spotify', 16, 16) %>
+                                      <%- data.icon('spotify', 16, 16) %>
                                     </a>
                                     <% } %>
                                       <% if (track.stems.length> 0) { %>
@@ -111,7 +111,7 @@
         </section>
         <% }); %>
 
-          <% if (albums.length===0) { %>
+          <% if (data.albums.length===0) { %>
             <section class="section">
               <div class="container text-center">
                 <p class="text-muted">No music available yet. Check back soon!</p>
@@ -130,7 +130,7 @@
               </section>
     </main>
 
-    <%- include('partials/footer.ejs') %>
+    <%- include('partials/footer.ejs', { data }) %>
 
       <script type="module" src="/js/music-player.js"></script>
 </body>
