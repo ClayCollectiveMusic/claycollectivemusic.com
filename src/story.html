@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head.ejs', {
+    title: 'Our Story | Clay Collective Music',
+    description: 'How a simple desire to worship became a movement serving churches across the region. The story of Clay Collective.',
+    keywords: 'Clay Collective, our story, worship collective, history',
+    ogTitle: 'Our Story | Clay Collective Music',
+    ogDescription: 'How a simple desire to worship became a movement serving churches across the region.',
+    canonical: 'story.html'
+  }) %>
+  <style>
+    .story-section {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .story-section p {
+      color: var(--color-text);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .story-section p:last-child {
+      margin-bottom: 0;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+      margin-top: 40px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background-color: var(--color-border);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 36px;
+    }
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: var(--color-accent);
+      border: 3px solid var(--color-bg);
+    }
+    .timeline-item .timeline-date {
+      color: var(--color-accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .timeline-item h3 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+    .timeline-item p {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <%- include('partials/nav.ejs', { activePage: 'people' }) %>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Our Story</h1>
+        <div class="accent-line"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="story-section">
+          <p>Clay Collective started with a simple idea: the local church deserves original worship music that sounds like its own voice. The name comes from the picture of jars of clay. We're ordinary people, shaped by a faithful God, and the music that comes out of that is something only real community can carry.</p>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">The Beginning</div>
+              <h3>Matt Greiner &amp; Ryan Kurtz Launch Clay Collective</h3>
+              <p>It started with Matt Greiner and Ryan Kurtz. They were friends who loved worship and wanted to write songs that churches could actually sing. Not from a Nashville writing room, but from prayer rooms and weekend gatherings. That early season produced <em>Living Stones</em>, Clay Collective's debut album and the foundation for everything that followed.</p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">A New Chapter</div>
+              <h3>Josh Smucker &amp; Bronley Plumb Pick Up the Mantle</h3>
+              <p>After <em>Living Stones</em>, the vision got passed forward. Josh Smucker and Bronley Plumb stepped in and sharpened the focus, centering Clay Collective specifically on congregational, corporate worship. The goal was clear: write songs that a room full of people can sing together on a Sunday morning. Songs with theological weight that are still simple enough for anyone to follow along.</p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">Growing the Team</div>
+              <h3>Ben Ord Joins the Collective</h3>
+              <p>About a year later, Ben Ord came on board, bringing new musical depth and creative energy. With his addition, the writing and production took a significant step forward. The team was growing, and so was the sound.</p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">The Bigger Picture</div>
+              <h3>A Regional Worship Community</h3>
+              <p>Clay Collective has never been about just one church or one band. Over the years, we've pulled in musicians, vocalists, and worship leaders from churches across the region. We write together, lead together, and record together. Some of our earlier recordings were done at Attic Studio, but more recently we've started recording in house, which gives us the freedom to capture songs in the same rooms where they were first sung.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer.ejs') %>
+
+</body>
+</html>
