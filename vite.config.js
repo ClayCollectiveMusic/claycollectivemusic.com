@@ -6,7 +6,7 @@ import fs from 'fs';
 import { scanMedia, generatePlayerData } from './src/lib/scan-media.js';
 
 // Load data
-const site = JSON.parse(fs.readFileSync('src/site.json', 'utf8'));
+let site = JSON.parse(fs.readFileSync('src/site.json', 'utf8'));
 
 // Scan media folders for albums, tracks, stems
 const mediaDir = resolve(__dirname, 'src/media');
@@ -43,6 +43,18 @@ export default defineConfig({
     {
       name: 'media-watcher',
       configureServer(server) {
+        // Watch site.json for changes
+        const siteJsonPath = resolve(__dirname, 'src/site.json');
+        server.watcher.add(siteJsonPath);
+        server.watcher.on('change', (file) => {
+          if (file === siteJsonPath) {
+            const updated = JSON.parse(fs.readFileSync(siteJsonPath, 'utf8'));
+            for (const key of Object.keys(site)) delete site[key];
+            Object.assign(site, updated);
+            server.ws.send({ type: 'full-reload' });
+          }
+        });
+
         // Watch the media directory for new/changed/deleted files
         server.watcher.add(mediaDir);
         const rescan = () => {

@@ -36,7 +36,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; <%= site.copyright %>
+      &copy; <%= site.copyright.replace(/\d\d\d\d/, new Date().getFullYear()) %>
     </div>
   </div>
 </footer>
