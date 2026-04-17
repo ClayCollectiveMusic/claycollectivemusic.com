@@ -223,6 +223,7 @@ main {
 /* --- Section --- */
 .section {
   padding: 40px 0;
+  scroll-margin-top: var(--nav-height);
 }
 
 .section-alt {
