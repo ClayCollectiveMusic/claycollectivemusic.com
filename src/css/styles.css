@@ -985,6 +985,12 @@ main {
   min-width: 0;
 }
 
+/* Download-all button, right-aligned in transport bar */
+.download-all-wrapper {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 /* Overall loading progress bar */
 .player-progress-bar {
   position: relative;
@@ -1377,5 +1383,11 @@ main {
 
   .player-transport {
     flex-wrap: wrap;
+  }
+
+  .download-all-wrapper {
+    margin-left: 0;
+    width: 100%;
+    order: 10;
   }
 }

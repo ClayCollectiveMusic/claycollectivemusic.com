@@ -267,7 +267,13 @@ function selectSong(key) {
 
   playerEl.style.display = 'block';
   overallProgressWrap.style.display = 'none';
-  downloadAllWrapper.style.display = 'none';
+  if (song.zipUrl) {
+    downloadAllBtn.href = song.zipUrl;
+    downloadAllBtn.setAttribute('download', '');
+    downloadAllWrapper.style.display = 'block';
+  } else {
+    downloadAllWrapper.style.display = 'none';
+  }
   renderTracks();
   updateTimeDisplay();
   updatePlayhead(0);
@@ -437,15 +443,6 @@ async function onSongChange(songKey, autoPlay) {
   updatePlayBtnState();
 
   var song = SONGS[songKey];
-
-  // Show download-all if zipUrl exists
-  if (song.zipUrl) {
-    downloadAllBtn.href = song.zipUrl;
-    downloadAllBtn.setAttribute('download', '');
-    downloadAllWrapper.style.display = 'block';
-  } else {
-    downloadAllWrapper.style.display = 'none';
-  }
 
   // Clear fake waveforms — blank canvases until real ones arrive
   tracks.forEach(function (track) {

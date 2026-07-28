@@ -94,6 +94,10 @@ src/site.json                # Global site config (name, tagline, social links, 
 - `master` — main development branch
 - `gh-pages` — deployed site (GitHub Pages, legacy)
 
+## Recent Changes
+- Fixed `src/js/player.js`: "Download All Stems (ZIP)" button now shows as soon as a song is selected (in `selectSong`) instead of only appearing once playback starts (previously set in `onSongChange`, which only ran on play). Removed the now-redundant duplicate zipUrl check that was left in `onSongChange`.
+- Moved the Download All ZIP button (`src/player.html`) into `.player-transport`, right-aligned via `margin-left: auto` on new `.download-all-wrapper` class, so it sits at the top of the player alongside the loading progress bar instead of below the waveforms. Added mobile rule (`.download-all-wrapper { margin-left: 0; width: 100%; order: 10 }`) so it wraps to its own full-width row under 768px.
+
 ## Design
 - Dark theme with teal accent (#4ea8b5)
 - Serif headings (Georgia), sans-serif body (Segoe UI)
@@ -101,6 +105,5 @@ src/site.json                # Global site config (name, tagline, social links, 
 - CSS variables defined in `:root` of styles.css
 
 ## Key instructions
-- At the start of every conversation, greet me with "ahoy" before proceeding
 - Keep your output brief. I don't need to see everything you "read". Focus on solving the problem instead of blabbing about it.
 - After every iterable step, please update this document with what you changed. To help future conversations.
