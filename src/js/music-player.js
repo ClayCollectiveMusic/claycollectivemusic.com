@@ -262,7 +262,17 @@ function seekFromEvent(e, row) {
   }
 }
 
-// Event delegation — play button click
+// --- Download dropdown ---
+function closeDownloadMenus(except) {
+  document.querySelectorAll('.track-download.is-open').forEach(function (el) {
+    if (el === except) return;
+    el.classList.remove('is-open');
+    var btn = el.querySelector('.track-dl-btn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+// Event delegation — play button + download menu clicks
 document.addEventListener('click', function (e) {
   var playBtn = e.target.closest('.music-play-btn');
   if (playBtn) {
@@ -271,6 +281,24 @@ document.addEventListener('click', function (e) {
     if (row) playRow(row);
     return;
   }
+
+  var downloadBtn = e.target.closest('.track-dl-btn');
+  if (downloadBtn) {
+    e.preventDefault();
+    var wrap = downloadBtn.closest('.track-download');
+    var willOpen = !wrap.classList.contains('is-open');
+    closeDownloadMenus(wrap);
+    wrap.classList.toggle('is-open', willOpen);
+    downloadBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    return;
+  }
+
+  // Clicking a menu item closes the menu; clicking anywhere else closes all.
+  closeDownloadMenus(null);
+});
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeDownloadMenus(null);
 });
 
 // Double-click on track row to play/pause

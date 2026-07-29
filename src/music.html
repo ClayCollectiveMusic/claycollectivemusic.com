@@ -92,23 +92,23 @@
                                           </svg>
                                         </a>
                                         <% } %>
-                                          <% if (track.stemsLink) { %>
-                                            <a href="<%= track.stemsLink %>" target="_blank" rel="noopener"
-                                               class="track-action-btn" title="Download Stems ZIP">
+                                          <div class="track-download">
+                                            <button type="button" class="track-action-btn track-dl-btn"
+                                                    title="Download" aria-label="Download" aria-haspopup="true" aria-expanded="false">
                                               <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                                <path
-                                                      d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10l-4-4h3V9h2v3h3l-4 4z" />
+                                                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
                                               </svg>
-                                            </a>
-                                            <% } %>
+                                            </button>
+                                            <div class="track-download-menu" role="menu">
+                                              <a href="<%= track.mp3Url %>" download role="menuitem">Download mp3</a>
                                               <% if (track.masterUrl) { %>
-                                                <a href="<%= track.masterUrl %>" target="_blank" rel="noopener"
-                                                   class="track-action-btn track-action-label"
-                                                   title="Download WAV">.wav</a>
+                                                <a href="<%= track.masterUrl %>" target="_blank" rel="noopener" role="menuitem">Download master</a>
                                                 <% } %>
-                                                  <a href="<%= track.mp3Url %>" download
-                                                     class="track-action-btn track-action-primary track-action-label"
-                                                     title="Download MP3">.mp3</a>
+                                              <% if (track.stemsLink) { %>
+                                                <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" role="menuitem">Download stems</a>
+                                                <% } %>
+                                            </div>
+                                          </div>
                                 </div>
                               </div>
                               <div class="music-progress-bar">

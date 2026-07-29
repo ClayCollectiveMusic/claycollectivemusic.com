@@ -421,7 +421,8 @@ main {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  overflow: hidden;
+  /* No overflow:hidden — it would clip the track download dropdown. Inner
+     elements (album art) carry their own rounding. */
 }
 
 .album-art {
@@ -509,7 +510,7 @@ main {
 
 .album-track-actions {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   flex-shrink: 0;
   align-items: center;
 }
@@ -518,13 +519,31 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 28px;
-  border-radius: 4px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 38px;
+  height: 36px;
+  padding: 0;
+  border-radius: 5px;
   border: 1px solid var(--color-border);
   color: var(--color-text-muted);
   background: transparent;
+  font: inherit;
   transition: all 0.15s ease;
+}
+
+.track-action-btn img {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Inline SVG glyphs have built-in padding in their 24x24 viewBox, so they must
+   render larger than the brand <img> icons to look optically the same size. */
+.track-action-btn svg {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
 }
 
 .track-action-btn:hover {
@@ -533,13 +552,49 @@ main {
 }
 
 
-.track-action-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  width: auto;
-  padding: 0 8px;
-  text-transform: lowercase;
+/* Download button + dropdown menu */
+.track-download {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.track-dl-btn {
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.track-download-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  min-width: 170px;
+  padding: 4px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.track-download.is-open .track-download-menu {
+  display: block;
+}
+
+.track-download-menu a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.track-download-menu a:hover {
+  background-color: rgba(78, 168, 181, 0.12);
+  color: var(--color-accent);
 }
 
 .track-action-primary {
@@ -577,7 +632,24 @@ main {
   .album-track-actions {
     width: 100%;
     padding-left: 40px;
-    margin-top: 4px;
+    margin-top: 8px;
+    gap: 8px;
+  }
+
+  /* Comfortable touch targets on mobile */
+  .track-action-btn {
+    width: 44px;
+    height: 42px;
+  }
+
+  .track-action-btn img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .track-action-btn svg {
+    width: 28px;
+    height: 28px;
   }
 }
 
