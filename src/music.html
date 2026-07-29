@@ -110,12 +110,15 @@
                                       </svg>
                                     </button>
                                     <div class="track-menu-list" role="menu">
-                                      <a href="<%= track.mp3Url %>" download role="menuitem">Download mp3</a>
+                                      <a href="<%= track.mp3Url %>" download role="menuitem">
+                                        <span class="file-tag">.mp3</span>Download mp3</a>
                                       <% if (track.masterUrl) { %>
-                                        <a href="<%= track.masterUrl %>" target="_blank" rel="noopener" role="menuitem">Download master</a>
+                                        <a href="<%= track.masterUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                          <span class="file-tag">.wav</span>Download master</a>
                                         <% } %>
                                       <% if (track.stemsLink) { %>
-                                        <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" role="menuitem">Download stems</a>
+                                        <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" role="menuitem">
+                                          <span class="file-tag">.zip</span>Download stems</a>
                                         <% } %>
                                     </div>
                                   </div>

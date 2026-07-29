@@ -605,6 +605,28 @@ main {
   flex-shrink: 0;
 }
 
+/* File-type badge in the download menu — occupies the same column as the
+   brand icons in the listen menu, so both menus line up. */
+.file-tag {
+  flex-shrink: 0;
+  min-width: 34px;
+  padding: 2px 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.track-menu-list a:hover .file-tag {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
 .track-action-primary {
   border-color: var(--color-accent);
   background-color: var(--color-accent);
