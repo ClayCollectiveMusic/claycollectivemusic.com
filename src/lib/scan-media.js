@@ -16,7 +16,9 @@
  *         "trackNum": 1,             // optional, falls back to array index + 1
  *         "stemsUrl": "https://...", // Google Drive zip link
  *         "masterUrl": "https://...",
- *         "spotifyUrl": "https://..."
+ *         "spotifyUrl": "https://...",
+ *         "youtubeUrl": "https://...",
+ *         "appleMusicUrl": "https://..."
  *       }
  *     ]
  *   }
@@ -75,6 +77,8 @@ export function scanMedia(mediaDir) {
       const stemsLink = meta.stemsUrl || meta.stemsLink || null;
       const masterUrl = meta.masterUrl || null;
       const spotifyUrl = meta.spotifyUrl || null;
+      const youtubeUrl = meta.youtubeUrl || null;
+      const appleMusicUrl = meta.appleMusicUrl || null;
 
       // Stems: read from album.json (populated by npm run process-media)
       // Each stem entry has { name, file } where file is the actual mp3 filename
@@ -94,6 +98,8 @@ export function scanMedia(mediaDir) {
         stemsLink,
         masterUrl,
         spotifyUrl,
+        youtubeUrl,
+        appleMusicUrl,
         stems,
       });
     }

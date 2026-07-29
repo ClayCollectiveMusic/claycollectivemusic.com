@@ -6,7 +6,7 @@
         <p><%= data.site.tagline %></p>
         <div class="social-links footer-socials">
           <% data.site.socials.forEach(function(s) { %>
-          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><%- data.icon(s.icon, 18, 18) %></a>
+          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><img src="images/icons/<%= s.icon %>.svg" width="18" height="18" alt=""></a>
           <% }); %>
         </div>
       </div>

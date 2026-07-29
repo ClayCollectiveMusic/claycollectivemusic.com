@@ -68,9 +68,21 @@
                                   <% if (track.spotifyUrl) { %>
                                     <a href="<%= track.spotifyUrl %>" target="_blank" rel="noopener"
                                        class="track-action-btn" title="Listen on Spotify">
-                                      <%- data.icon('spotify', 16, 16) %>
+                                      <img src="images/icons/spotify.svg" width="16" height="16" alt="">
                                     </a>
                                     <% } %>
+                                      <% if (track.youtubeUrl) { %>
+                                        <a href="<%= track.youtubeUrl %>" target="_blank" rel="noopener"
+                                           class="track-action-btn" title="Watch on YouTube">
+                                          <img src="images/icons/youtube.svg" width="16" height="16" alt="">
+                                        </a>
+                                        <% } %>
+                                      <% if (track.appleMusicUrl) { %>
+                                        <a href="<%= track.appleMusicUrl %>" target="_blank" rel="noopener"
+                                           class="track-action-btn" title="Listen on Apple Music">
+                                          <img src="images/icons/apple-music.svg" width="16" height="16" alt="">
+                                        </a>
+                                        <% } %>
                                       <% if (track.stems.length> 0) { %>
                                         <a href="player.html?song=<%= album.slug %>--<%= track.slug %>"
                                            class="track-action-btn" title="Stem Player">

@@ -529,12 +529,9 @@ main {
 
 .track-action-btn:hover {
   border-color: var(--color-accent);
-  color: var(--color-accent);
+  background-color: rgba(78, 168, 181, 0.1);
 }
 
-.track-action-btn[title="Listen on Spotify"] {
-  color: #1DB954;
-}
 
 .track-action-label {
   font-size: 0.65rem;
@@ -1177,19 +1174,19 @@ main {
 }
 
 .social-links a {
-  color: var(--color-text-muted);
   font-size: 0.85rem;
-  transition: color 0.2s ease;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .social-links a:hover {
-  color: var(--color-white);
+  opacity: 1;
+  transform: translateY(-2px);
 }
 
-.social-links svg {
+.social-links img {
   width: 20px;
   height: 20px;
-  fill: currentColor;
   vertical-align: middle;
 }
 

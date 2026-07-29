@@ -179,7 +179,7 @@
         </div>
         <div class="social-links" style="justify-content: center;">
           <% data.site.socials.forEach(function(s) { %>
-          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><%- data.icon(s.icon) %></a>
+          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><img src="images/icons/<%= s.icon %>.svg" width="24" height="24" alt=""></a>
           <% }); %>
         </div>
       </div>
@@ -234,7 +234,7 @@
         <div class="listen-grid">
           <% data.site.listen.forEach(function(l) { %>
           <a href="<%= l.url %>" target="_blank" rel="noopener" class="listen-card">
-            <%- data.icon(l.icon) %>
+            <img src="images/icons/<%= l.icon %>.svg" width="24" height="24" alt="">
             <span><%= l.name %></span>
           </a>
           <% }); %>
