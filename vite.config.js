@@ -31,7 +31,13 @@ export default defineConfig({
         server.watcher.add(siteJsonPath);
         server.watcher.on('change', (file) => {
           if (file === siteJsonPath) {
-            data.site = JSON.parse(fs.readFileSync(siteJsonPath, 'utf8'));
+            // Keep the last-good config if site.json is mid-edit / malformed.
+            try {
+              data.site = JSON.parse(fs.readFileSync(siteJsonPath, 'utf8'));
+            } catch (e) {
+              console.warn(`[site.json] Invalid JSON, keeping previous values: ${e.message}`);
+              return;
+            }
             server.ws.send({ type: 'full-reload' });
           }
         });
@@ -39,7 +45,13 @@ export default defineConfig({
         // Watch the media directory for new/changed/deleted files
         server.watcher.add(mediaDir);
         const rescan = () => {
-          data.albums = scanMedia(mediaDir);
+          // Never let a scan error take down the dev server.
+          try {
+            data.albums = scanMedia(mediaDir);
+          } catch (e) {
+            console.warn(`[scan-media] Rescan failed, keeping previous albums: ${e.message}`);
+            return;
+          }
           server.ws.send({ type: 'full-reload' });
         };
         server.watcher.on('add', rescan);

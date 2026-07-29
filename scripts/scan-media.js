@@ -56,7 +56,15 @@ export function scanMedia(mediaDir) {
     // album.json is required — it's the source of truth for tracks
     const albumJsonPath = path.join(albumPath, 'album.json');
     if (!fs.existsSync(albumJsonPath)) continue;
-    const albumMeta = JSON.parse(fs.readFileSync(albumJsonPath, 'utf8'));
+
+    // Don't let a malformed album.json (e.g. mid-edit in the dev server) crash the build/watcher.
+    let albumMeta;
+    try {
+      albumMeta = JSON.parse(fs.readFileSync(albumJsonPath, 'utf8'));
+    } catch (e) {
+      console.warn(`[scan-media] Skipping "${dirName}" — invalid album.json: ${e.message}`);
+      continue;
+    }
 
     const metaTracks = albumMeta.tracks || [];
     if (metaTracks.length === 0) continue;
