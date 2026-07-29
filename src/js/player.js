@@ -70,7 +70,14 @@ var animFrameId = null;
 var seekPct = 0; // tracks playhead position as 0-1, even before duration is known
 
 // Waveform settings
-var WAVEFORM_SAMPLES = 800;
+// Peaks are extracted once at high resolution, then downsampled at draw time to
+// however many device pixels the canvas actually has. Hardcoding a low bar count
+// is what made these look blocky: 800 bars stretched across a wide backing store
+// gives multi-pixel bars with visible gaps between them.
+var WAVEFORM_SAMPLES = 2000;
+// Device-pixel width per drawn bar. At 1 the bars butt up against each other with
+// no gap at all, which reads as a continuous waveform rather than a bar graph.
+var WAVEFORM_BAR_PX = 1;
 var TRACK_HEIGHT = 32;
 
 function getCategoryColor(catKey) {
@@ -357,16 +364,26 @@ function buildSongList() {
 function getPeaks(buffer, numSamples) {
   var numChannels = buffer.numberOfChannels;
   var length = buffer.getChannelData(0).length;
-  var blockSize = Math.floor(length / numSamples);
-  var peaks = new Float32Array(numSamples);
+  // Hoist channel lookups out of the inner loop — getChannelData() per block is
+  // needlessly expensive at this bucket count.
+  var channels = [];
+  for (var ch = 0; ch < numChannels; ch++) channels.push(buffer.getChannelData(ch));
+
+  var buckets = Math.max(1, Math.min(numSamples, length));
+  var peaks = new Float32Array(buckets);
+  // Fractional stride so the tail of the file isn't dropped by integer division.
+  var perBucket = length / buckets;
   var globalMax = 0;
-  for (var i = 0; i < numSamples; i++) {
-    var start = i * blockSize;
+
+  for (var i = 0; i < buckets; i++) {
+    var start = Math.floor(i * perBucket);
+    var end = Math.min(length, Math.max(start + 1, Math.floor((i + 1) * perBucket)));
     var max = 0;
-    for (var ch = 0; ch < numChannels; ch++) {
-      var chan = buffer.getChannelData(ch);
-      for (var j = 0; j < blockSize; j++) {
-        var val = Math.abs(chan[start + j]);
+    for (var c = 0; c < numChannels; c++) {
+      var chan = channels[c];
+      for (var j = start; j < end; j++) {
+        var val = chan[j];
+        if (val < 0) val = -val;
         if (val > max) max = val;
       }
     }
@@ -375,8 +392,8 @@ function getPeaks(buffer, numSamples) {
   }
   // Normalize so the loudest peak = 1.0
   if (globalMax > 0) {
-    for (var i = 0; i < numSamples; i++) {
-      peaks[i] = peaks[i] / globalMax;
+    for (var k = 0; k < buckets; k++) {
+      peaks[k] = peaks[k] / globalMax;
     }
   }
   return peaks;
@@ -386,7 +403,6 @@ function drawWaveform(canvas, peaks, playbackPct, rgb) {
   var ctx = canvas.getContext('2d');
   var w = canvas.width;
   var h = canvas.height;
-  var barW = w / peaks.length;
   var splitX = playbackPct * w;
   var r = rgb[0], g = rgb[1], b = rgb[2];
   var colorPlayed = 'rgba(' + r + ',' + g + ',' + b + ',0.9)';
@@ -394,12 +410,33 @@ function drawWaveform(canvas, peaks, playbackPct, rgb) {
 
   ctx.clearRect(0, 0, w, h);
 
-  for (var i = 0; i < peaks.length; i++) {
-    var x = i * barW;
-    var barH = Math.max(1, peaks[i] * h * 0.95);
+  // Draw one bar per WAVEFORM_BAR_PX device pixels, folding the surplus source
+  // peaks into each bar with a max() so transients survive the downsample. The
+  // peaks.length clamp keeps low-resolution inputs (drawFakeWaveform) from being
+  // stretched into more bars than they have data for.
+  var bars = Math.max(1, Math.min(peaks.length, Math.floor(w / WAVEFORM_BAR_PX)));
+  var barW = w / bars;
+  var perBar = peaks.length / bars;
+  // Snap each bar to whole device pixels and butt it against the next one. Using
+  // a fractional width here is what left faint gaps: the canvas antialiases a
+  // 2.6px-wide rect into a solid core with translucent edges, reading as a seam.
+  var gap = barW > 3 ? 1 : 0;
+
+  for (var i = 0; i < bars; i++) {
+    var from = Math.floor(i * perBar);
+    var to = Math.min(peaks.length, Math.max(from + 1, Math.floor((i + 1) * perBar)));
+    var peak = 0;
+    for (var j = from; j < to; j++) {
+      if (peaks[j] > peak) peak = peaks[j];
+    }
+    // Round both edges to whole pixels so bar N ends exactly where bar N+1
+    // begins — no antialiased seam, no accumulating drift across the canvas.
+    var x = Math.round(i * barW);
+    var xNext = Math.round((i + 1) * barW);
+    var barH = Math.max(1, peak * h * 0.95);
     var y = (h - barH) / 2;
     ctx.fillStyle = (x + barW) <= splitX ? colorPlayed : colorUnplayed;
-    ctx.fillRect(x, y, Math.max(1, barW - 1), barH);
+    ctx.fillRect(x, y, Math.max(1, xNext - x - gap), barH);
   }
 }
 

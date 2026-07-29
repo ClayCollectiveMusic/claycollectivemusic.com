@@ -16,8 +16,9 @@ var waveformCache = {}; // mp3url -> { peaks, canvas }
 // is what made this look blocky: a 400-bar waveform stretched across a ~2100px
 // backing store gives 5px-wide bars with visible gaps.
 var WAVEFORM_SAMPLES = 4000;
-// Target device-pixel width per drawn bar (bar + its 0.5px gap).
-var WAVEFORM_BAR_PX = 2;
+// Device-pixel width per drawn bar. At 1 the bars butt up against each other with
+// no gap at all, which reads as a continuous waveform rather than a bar graph.
+var WAVEFORM_BAR_PX = 1;
 var WAVEFORM_HEIGHT = 32;
 var WAVEFORM_COLOR = [78, 168, 181]; // teal accent
 // How many frames to keep retrying a draw while the progress bar has no layout
@@ -84,6 +85,10 @@ function drawWaveform(canvas, peaks, playbackPct) {
   var bars = Math.max(1, Math.min(peaks.length, Math.floor(w / WAVEFORM_BAR_PX)));
   var barW = w / bars;
   var perBar = peaks.length / bars;
+  // Snap each bar to whole device pixels and butt it against the next one. Using
+  // a fractional width here is what left faint gaps: the canvas antialiases a
+  // 2.6px-wide rect into a solid core with translucent edges, reading as a seam.
+  var gap = barW > 3 ? 1 : 0;
 
   for (var i = 0; i < bars; i++) {
     var from = Math.floor(i * perBar);
@@ -92,11 +97,14 @@ function drawWaveform(canvas, peaks, playbackPct) {
     for (var j = from; j < to; j++) {
       if (peaks[j] > peak) peak = peaks[j];
     }
-    var x = i * barW;
+    // Round both edges to whole pixels so bar N ends exactly where bar N+1
+    // begins — no antialiased seam, no accumulating drift across the canvas.
+    var x = Math.round(i * barW);
+    var xNext = Math.round((i + 1) * barW);
     var barH = Math.max(1, peak * h * 0.95);
     var y = (h - barH) / 2;
     ctx.fillStyle = (x + barW) <= splitX ? colorPlayed : colorUnplayed;
-    ctx.fillRect(x, y, Math.max(1, barW - 0.5), barH);
+    ctx.fillRect(x, y, Math.max(1, xNext - x - gap), barH);
   }
 }
 
