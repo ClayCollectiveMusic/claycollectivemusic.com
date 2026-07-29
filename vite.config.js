@@ -3,7 +3,7 @@ import { ViteEjsPlugin } from 'vite-plugin-ejs';
 import { resolve } from 'path';
 import glob from 'glob-all';
 import fs from 'fs';
-import { scanMedia, generatePlayerData } from './src/lib/scan-media.js';
+import { scanMedia, generatePlayerData } from './scripts/scan-media.js';
 
 // Scan media folders for albums, tracks, stems
 const mediaDir = resolve(__dirname, 'src/media');

@@ -24,7 +24,7 @@ src/                        # Vite root
   css/styles.css             # All styles (shared across pages)
   js/player.js               # Multitrack stem player (Web Audio API)
   js/music-player.js          # Inline track player for music.html (HTML5 Audio)
-  lib/scan-media.js          # Build-time media scanner (used by vite config)
+  images/                     # Logo, icons (SVG brand icons in images/icons/, referenced via relative <img> paths)
   partials/
     head.ejs                 # <head> partial (meta, CSS link)
     nav.ejs                  # Navigation bar
@@ -41,6 +41,7 @@ src/                        # Vite root
 
 scripts/
   process-media.ts           # Creates missing album.json files, converts .wav to .mp3 via ffmpeg, deletes originals
+  scan-media.js               # Build-time media scanner (imported by vite.config.js — not a manual-run script, but build tooling, so it lives outside src/)
 
 public/
   bg.png                     # Background image
@@ -53,7 +54,7 @@ src/site.json                # Global site config (name, tagline, social links, 
 ## Key Concepts
 
 ### Media Scanning (Build Time)
-`src/lib/scan-media.js` scans `src/media/` at build time (called from `vite.config.js`). It:
+`scripts/scan-media.js` scans `src/media/` at build time (called from `vite.config.js`). It:
 - Discovers albums by folder name pattern: `"Album Name (Year)"`
 - Finds tracks in `tracks/` subfolder: `"NN - Track Name.mp3"`
 - Finds stems in `stems/NN - Track Name/` subfolder
@@ -97,9 +98,9 @@ src/site.json                # Global site config (name, tagline, social links, 
 ## Recent Changes
 - Fixed `src/js/player.js`: "Download All Stems (ZIP)" button now shows as soon as a song is selected (in `selectSong`) instead of only appearing once playback starts (previously set in `onSongChange`, which only ran on play). Removed the now-redundant duplicate zipUrl check that was left in `onSongChange`.
 - Moved the Download All ZIP button (`src/player.html`) into `.player-transport`, right-aligned via `margin-left: auto` on new `.download-all-wrapper` class, so it sits at the top of the player alongside the loading progress bar instead of below the waveforms. Added mobile rule (`.download-all-wrapper { margin-left: 0; width: 100%; order: 10 }`) so it wraps to its own full-width row under 768px.
-- Added `youtubeUrl` support: `src/lib/scan-media.js` now reads `youtubeUrl` from each track in `album.json` and passes it through; `src/music.html` renders a YouTube icon link next to the Spotify link when `track.youtubeUrl` is set. YouTube icon in `vite.config.js` split into two paths (red body via `currentColor`, white play triangle) to match the real logo.
-- Added `appleMusicUrl` support the same way: read in `scan-media.js`, rendered via existing `apple-music` icon in `music.html`.
-- **Icons moved to static files.** All icons (`spotify`, `apple-music`, `youtube`, `instagram`, `facebook`, `amazon-music`) now live as real `.svg` files in `src/public/icons/` (Vite's public dir, since `root: 'src'`), served at `/icons/<name>.svg`. `youtube.svg` and `apple-music.svg` are official brand SVGs (multi-color/gradient, not `currentColor`-based); the rest are still hand-recreated placeholder path data pending official source files — safe to overwrite those files directly when official SVGs are available, no code changes needed elsewhere. `icon(name, w, h)` in `vite.config.js` now just returns an `<img src="/icons/name.svg">` tag instead of inlining SVG markup. Since `<img>` can't be recolored via CSS `currentColor`, hover states on icon links (`.social-links a`, `.track-action-btn`) now use opacity/transform/background-color on the wrapping link/button instead of a color swap on the icon itself.
+- Added `youtubeUrl` and `appleMusicUrl` support: read in `scripts/scan-media.js`, passed through to track data.
+- **Icons moved to static files.** All icons (`spotify`, `apple-music`, `youtube`, `instagram`, `facebook`, `amazon-music`) live as real `.svg` files in `src/images/icons/`, referenced directly with relative `<img src="images/icons/name.svg">` tags in templates (same pattern as the existing `images/logo-icon-white.png` reference in `nav.ejs`) — no helper function, no Vite public dir. Vite's HTML asset pipeline picks up the relative `src=` references and copies the files into `dist/` automatically at build time. `youtube.svg` and `apple-music.svg` are official brand SVGs (multi-color/gradient); the rest are still hand-recreated placeholder path data pending official source files — safe to overwrite those files directly later, no code changes needed elsewhere. Since `<img>` can't be recolored via CSS `currentColor`, hover states on icon links (`.social-links a`, `.track-action-btn`) use opacity/transform/background-color on the wrapping link/button instead of a color swap on the icon itself.
+- Moved `scan-media.js` from `src/lib/` to `scripts/` (removed `src/lib/`) — it's build-time tooling imported by `vite.config.js`, not shipped site source, so it belongs alongside `process-media.ts` rather than under `src/`.
 
 ## Design
 - Dark theme with teal accent (#4ea8b5)
