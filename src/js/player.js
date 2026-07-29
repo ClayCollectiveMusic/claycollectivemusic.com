@@ -306,24 +306,50 @@ function buildSongList() {
     return;
   }
 
+  // Group songs by album, preserving the order they arrive in (albums are
+  // already sorted newest-first by the build-time media scanner).
+  var groups = [];
+  var byAlbum = {};
   keys.forEach(function (key) {
     var song = SONGS[key];
-    var item = document.createElement('button');
-    item.type = 'button';
-    item.className = 'song-item';
-    item.setAttribute('data-song', key);
+    var albumKey = song.albumSlug || song.albumName || '_';
+    if (!byAlbum[albumKey]) {
+      byAlbum[albumKey] = { song: song, keys: [] };
+      groups.push(byAlbum[albumKey]);
+    }
+    byAlbum[albumKey].keys.push(key);
+  });
 
-    var art = song.artUrl
-      ? '<img class="song-item-art" src="' + song.artUrl + '" alt="">'
-      : '<div class="song-item-art song-item-art-placeholder"></div>';
+  groups.forEach(function (group) {
+    var album = group.song;
+    var row = document.createElement('div');
+    row.className = 'album-row';
 
-    item.innerHTML = art +
-      '<div class="song-item-info">' +
-        '<span class="song-item-title">' + song.title.split(' \u2014 ')[0] + '</span>' +
-        (song.albumName ? '<span class="song-item-album">' + song.albumName + '</span>' : '') +
-      '</div>';
+    var art = album.artUrl
+      ? '<img class="album-row-art" src="' + album.artUrl + '" alt="">'
+      : '<div class="album-row-art album-row-art-placeholder"></div>';
 
-    songListEl.appendChild(item);
+    var songBtns = group.keys.map(function (key) {
+      var song = SONGS[key];
+      return '<button type="button" class="song-chip" data-song="' + key + '">' +
+        song.title.split(' \u2014 ')[0] +
+        '</button>';
+    }).join('');
+
+    row.innerHTML =
+      '<div class="album-row-header">' +
+        art +
+        '<div class="album-row-info">' +
+          '<span class="album-row-name">' + (album.albumName || 'Songs') + '</span>' +
+          '<span class="album-row-meta">' +
+            (album.albumYear ? album.albumYear + ' \u00b7 ' : '') +
+            group.keys.length + (group.keys.length === 1 ? ' song' : ' songs') +
+          '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="album-row-songs">' + songBtns + '</div>';
+
+    songListEl.appendChild(row);
   });
 }
 

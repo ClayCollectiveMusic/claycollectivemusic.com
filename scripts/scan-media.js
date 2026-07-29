@@ -162,6 +162,8 @@ export function generatePlayerData(albums) {
         slug: album.slug + '--' + track.slug,
         title,
         albumName: album.name,
+        albumSlug: album.slug,
+        albumYear: album.year || '',
         artUrl: album.artUrl || '',
         zipUrl: track.stemsLink || '',
         stemsUrl: track.stemsLink || '',

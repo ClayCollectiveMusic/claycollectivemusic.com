@@ -11,9 +11,17 @@ var animId = null;
 
 // Waveform state per row (keyed by mp3 url)
 var waveformCache = {}; // mp3url -> { peaks, canvas }
-var WAVEFORM_SAMPLES = 400;
+// Peaks are extracted once at high resolution, then downsampled at draw time to
+// however many device pixels the canvas actually has. Hardcoding a low bar count
+// is what made this look blocky: a 400-bar waveform stretched across a ~2100px
+// backing store gives 5px-wide bars with visible gaps.
+var WAVEFORM_SAMPLES = 4000;
+// Target device-pixel width per drawn bar (bar + its 0.5px gap).
+var WAVEFORM_BAR_PX = 2;
 var WAVEFORM_HEIGHT = 32;
 var WAVEFORM_COLOR = [78, 168, 181]; // teal accent
+// How many frames to keep retrying a draw while the progress bar has no layout
+var WAVEFORM_RENDER_ATTEMPTS = 60;
 
 // Lazily create AudioContext for decoding (not for playback — we use HTML5 Audio)
 var decodeCtx = null;
@@ -26,16 +34,26 @@ function getDecodeCtx() {
 function getPeaks(buffer, numSamples) {
   var numChannels = buffer.numberOfChannels;
   var length = buffer.getChannelData(0).length;
-  var blockSize = Math.floor(length / numSamples);
-  var peaks = new Float32Array(numSamples);
+  // Hoist channel lookups out of the inner loop — getChannelData() per block is
+  // needlessly expensive at this bucket count.
+  var channels = [];
+  for (var ch = 0; ch < numChannels; ch++) channels.push(buffer.getChannelData(ch));
+
+  var buckets = Math.max(1, Math.min(numSamples, length));
+  var peaks = new Float32Array(buckets);
+  // Fractional stride so the tail of the file isn't dropped by integer division.
+  var perBucket = length / buckets;
   var globalMax = 0;
-  for (var i = 0; i < numSamples; i++) {
-    var start = i * blockSize;
+
+  for (var i = 0; i < buckets; i++) {
+    var start = Math.floor(i * perBucket);
+    var end = Math.min(length, Math.max(start + 1, Math.floor((i + 1) * perBucket)));
     var max = 0;
-    for (var ch = 0; ch < numChannels; ch++) {
-      var chan = buffer.getChannelData(ch);
-      for (var j = 0; j < blockSize; j++) {
-        var val = Math.abs(chan[start + j]);
+    for (var c = 0; c < numChannels; c++) {
+      var chan = channels[c];
+      for (var j = start; j < end; j++) {
+        var val = chan[j];
+        if (val < 0) val = -val;
         if (val > max) max = val;
       }
     }
@@ -43,8 +61,8 @@ function getPeaks(buffer, numSamples) {
     if (max > globalMax) globalMax = max;
   }
   if (globalMax > 0) {
-    for (var i = 0; i < numSamples; i++) {
-      peaks[i] = peaks[i] / globalMax;
+    for (var k = 0; k < buckets; k++) {
+      peaks[k] = peaks[k] / globalMax;
     }
   }
   return peaks;
@@ -54,7 +72,6 @@ function drawWaveform(canvas, peaks, playbackPct) {
   var ctx = canvas.getContext('2d');
   var w = canvas.width;
   var h = canvas.height;
-  var barW = w / peaks.length;
   var splitX = playbackPct * w;
   var r = WAVEFORM_COLOR[0], g = WAVEFORM_COLOR[1], b = WAVEFORM_COLOR[2];
   var colorPlayed = 'rgba(' + r + ',' + g + ',' + b + ',0.9)';
@@ -62,30 +79,61 @@ function drawWaveform(canvas, peaks, playbackPct) {
 
   ctx.clearRect(0, 0, w, h);
 
-  for (var i = 0; i < peaks.length; i++) {
+  // Draw one bar per WAVEFORM_BAR_PX device pixels, folding the surplus source
+  // peaks into each bar with a max() so transients survive the downsample.
+  var bars = Math.max(1, Math.min(peaks.length, Math.floor(w / WAVEFORM_BAR_PX)));
+  var barW = w / bars;
+  var perBar = peaks.length / bars;
+
+  for (var i = 0; i < bars; i++) {
+    var from = Math.floor(i * perBar);
+    var to = Math.min(peaks.length, Math.max(from + 1, Math.floor((i + 1) * perBar)));
+    var peak = 0;
+    for (var j = from; j < to; j++) {
+      if (peaks[j] > peak) peak = peaks[j];
+    }
     var x = i * barW;
-    var barH = Math.max(1, peaks[i] * h * 0.95);
+    var barH = Math.max(1, peak * h * 0.95);
     var y = (h - barH) / 2;
     ctx.fillStyle = (x + barW) <= splitX ? colorPlayed : colorUnplayed;
-    ctx.fillRect(x, y, Math.max(1, barW - 1), barH);
+    ctx.fillRect(x, y, Math.max(1, barW - 0.5), barH);
   }
+}
+
+// Measure the drawable width of a progress bar. Returns 0 if it isn't laid out
+// yet (e.g. still display:none), so callers can retry rather than create a
+// zero-width canvas that never renders.
+function measureBarWidth(bar) {
+  return bar.clientWidth || bar.offsetWidth ||
+    (bar.parentElement ? bar.parentElement.clientWidth : 0);
+}
+
+// Apply backing-store + CSS size for the current layout. Safe to call repeatedly.
+function sizeCanvas(canvas, w) {
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(WAVEFORM_HEIGHT * dpr);
+  canvas.style.width = w + 'px';
+  canvas.style.height = WAVEFORM_HEIGHT + 'px';
 }
 
 function setupCanvas(row) {
   var bar = row.querySelector('.music-progress-bar');
   if (!bar) return null;
 
+  var w = measureBarWidth(bar);
+  if (!w) return null; // not laid out yet — caller retries on next frame
+
   // Check if canvas already exists
   var existing = bar.querySelector('canvas');
-  if (existing) return existing;
+  if (existing) {
+    // Re-size if layout changed since creation (rotation, late layout on mobile)
+    if (parseFloat(existing.style.width) !== w) sizeCanvas(existing, w);
+    return existing;
+  }
 
   var canvas = document.createElement('canvas');
-  var dpr = window.devicePixelRatio || 1;
-  var w = bar.clientWidth;
-  canvas.width = w * dpr;
-  canvas.height = WAVEFORM_HEIGHT * dpr;
-  canvas.style.width = w + 'px';
-  canvas.style.height = WAVEFORM_HEIGHT + 'px';
+  sizeCanvas(canvas, w);
   canvas.style.display = 'block';
   canvas.style.position = 'absolute';
   canvas.style.top = '0';
@@ -99,43 +147,65 @@ function setupCanvas(row) {
   return canvas;
 }
 
+// Draw the waveform for a row, retrying on the next frame while the progress
+// bar has no layout yet. Without this, a canvas created at width 0 on mobile
+// stays blank forever because nothing re-measures it.
+function renderWaveform(row, peaks, attemptsLeft) {
+  var canvas = setupCanvas(row);
+  if (!canvas) {
+    if (attemptsLeft > 0 && activeRow === row) {
+      requestAnimationFrame(function () {
+        renderWaveform(row, peaks, attemptsLeft - 1);
+      });
+    }
+    return;
+  }
+  var mp3 = row.getAttribute('data-mp3');
+  if (mp3 && waveformCache[mp3]) waveformCache[mp3].canvas = canvas;
+  var pct = audio.duration ? audio.currentTime / audio.duration : 0;
+  drawWaveform(canvas, peaks, pct);
+}
+
 function loadWaveform(row) {
   var mp3 = row.getAttribute('data-mp3');
   if (!mp3) return;
 
   // Already cached
   if (waveformCache[mp3] && waveformCache[mp3].peaks) {
-    var canvas = setupCanvas(row);
-    if (canvas) {
-      waveformCache[mp3].canvas = canvas;
-      var pct = audio.duration ? audio.currentTime / audio.duration : 0;
-      drawWaveform(canvas, waveformCache[mp3].peaks, pct);
-    }
+    renderWaveform(row, waveformCache[mp3].peaks, WAVEFORM_RENDER_ATTEMPTS);
     return;
   }
 
+  // Already failed once — don't retry the (expensive) decode on every play
+  if (waveformCache[mp3] && waveformCache[mp3].failed) return;
+
   // Mark as loading
-  waveformCache[mp3] = { peaks: null, canvas: null };
+  waveformCache[mp3] = { peaks: null, canvas: null, failed: false };
 
   fetch(mp3)
     .then(function (r) { return r.arrayBuffer(); })
-    .then(function (buf) { return getDecodeCtx().decodeAudioData(buf); })
+    .then(function (buf) {
+      // decodeAudioData is callback-style on older WebKit/Android — wrap so both work
+      return new Promise(function (resolve, reject) {
+        var ret = getDecodeCtx().decodeAudioData(buf, resolve, reject);
+        if (ret && typeof ret.then === 'function') ret.then(resolve, reject);
+      });
+    })
     .then(function (audioBuffer) {
       var peaks = getPeaks(audioBuffer, WAVEFORM_SAMPLES);
       waveformCache[mp3].peaks = peaks;
 
       // Only set up canvas if this row is still active
       if (activeRow === row) {
-        var canvas = setupCanvas(row);
-        if (canvas) {
-          waveformCache[mp3].canvas = canvas;
-          var pct = audio.duration ? audio.currentTime / audio.duration : 0;
-          drawWaveform(canvas, peaks, pct);
-        }
+        renderWaveform(row, peaks, WAVEFORM_RENDER_ATTEMPTS);
       }
     })
     .catch(function (err) {
+      // Decoding a whole MP3 can fail on memory-constrained mobile browsers.
+      // Keep the simple fill bar visible instead of leaving an empty bar.
       console.error('Failed to decode waveform:', err);
+      if (waveformCache[mp3]) waveformCache[mp3].failed = true;
+      removeCanvasFromRow(row);
     });
 }
 
@@ -263,6 +333,25 @@ function seekFromEvent(e, row) {
 }
 
 // --- Track action dropdowns (Listen / Download) ---
+var MENU_VIEWPORT_MARGIN = 8;
+
+// Left-align the menu with its button, but shift it left if it would overflow
+// the right edge of the viewport (and never past the left edge).
+function positionTrackMenu(wrap) {
+  var list = wrap.querySelector('.track-menu-list');
+  if (!list) return;
+
+  list.style.left = '0px';
+
+  var wrapLeft = wrap.getBoundingClientRect().left;
+  var width = list.offsetWidth;
+  var maxLeft = window.innerWidth - MENU_VIEWPORT_MARGIN - width;
+  // Desired viewport position is flush with the button; clamp into the viewport.
+  var targetLeft = Math.max(MENU_VIEWPORT_MARGIN, Math.min(wrapLeft, maxLeft));
+
+  list.style.left = (targetLeft - wrapLeft) + 'px';
+}
+
 function closeTrackMenus(except) {
   document.querySelectorAll('.track-menu.is-open').forEach(function (el) {
     if (el === except) return;
@@ -271,6 +360,14 @@ function closeTrackMenus(except) {
     if (btn) btn.setAttribute('aria-expanded', 'false');
   });
 }
+
+function repositionOpenTrackMenu() {
+  var open = document.querySelector('.track-menu.is-open');
+  if (open) positionTrackMenu(open);
+}
+
+window.addEventListener('resize', repositionOpenTrackMenu);
+window.addEventListener('scroll', repositionOpenTrackMenu, true);
 
 // Event delegation — play button + dropdown menu clicks
 document.addEventListener('click', function (e) {
@@ -290,6 +387,8 @@ document.addEventListener('click', function (e) {
     closeTrackMenus(wrap);
     wrap.classList.toggle('is-open', willOpen);
     menuBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    // Must run after it's visible — a display:none menu has no width to measure.
+    if (willOpen) positionTrackMenu(wrap);
     return;
   }
 
@@ -351,23 +450,14 @@ audio.addEventListener('ended', function () {
   activeRow = null;
 });
 
-// Handle window resize — update canvas size for active waveform
-window.addEventListener('resize', function () {
+// Handle resize / rotation — re-measure and redraw the active waveform
+function handleWaveformResize() {
   if (!activeRow) return;
   var mp3 = activeRow.getAttribute('data-mp3');
   var cached = mp3 && waveformCache[mp3];
   if (!cached || !cached.peaks) return;
-  var bar = activeRow.querySelector('.music-progress-bar');
-  if (!bar) return;
-  var canvas = bar.querySelector('canvas');
-  if (!canvas) return;
-  var dpr = window.devicePixelRatio || 1;
-  var w = bar.clientWidth;
-  canvas.width = w * dpr;
-  canvas.height = WAVEFORM_HEIGHT * dpr;
-  canvas.style.width = w + 'px';
-  canvas.style.height = WAVEFORM_HEIGHT + 'px';
-  cached.canvas = canvas;
-  var pct = audio.duration ? audio.currentTime / audio.duration : 0;
-  drawWaveform(canvas, cached.peaks, pct);
-});
+  renderWaveform(activeRow, cached.peaks, WAVEFORM_RENDER_ATTEMPTS);
+}
+
+window.addEventListener('resize', handleWaveformResize);
+window.addEventListener('orientationchange', handleWaveformResize);

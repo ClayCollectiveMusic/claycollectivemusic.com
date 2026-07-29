@@ -568,9 +568,12 @@ main {
   display: none;
   position: absolute;
   top: calc(100% + 6px);
-  right: 0;
+  /* Left-aligned to the button by default; JS clamps it into the viewport
+     when there isn't room to the right (see positionTrackMenu). */
+  left: 0;
   z-index: 20;
   min-width: 170px;
+  max-width: calc(100vw - 16px);
   padding: 4px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -756,68 +759,104 @@ main {
 }
 
 /* --- Song Picker --- */
+/* --- Song picker, grouped by album --- */
 .song-list {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 24px;
 }
 
-.song-item {
+.album-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 10px 16px 10px 10px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.album-row-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 16px 8px 8px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-  color: var(--color-text);
-  font-family: inherit;
-  text-align: left;
+  min-width: 200px;
+  flex-shrink: 0;
 }
 
-.song-item:hover {
-  border-color: var(--color-accent);
-  background-color: var(--color-surface-hover);
-}
-
-.song-item.active {
-  border-color: var(--color-accent);
-  background-color: rgba(78, 168, 181, 0.1);
-}
-
-.song-item-art {
-  width: 44px;
-  height: 44px;
+.album-row-art {
+  width: 48px;
+  height: 48px;
   border-radius: 4px;
   object-fit: cover;
   flex-shrink: 0;
 }
 
-.song-item-art-placeholder {
+.album-row-art-placeholder {
   background-color: var(--color-bg);
 }
 
-.song-item-info {
+.album-row-info {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.song-item-title {
-  font-size: 0.9rem;
+.album-row-name {
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--color-white);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.song-item-album {
+.album-row-meta {
   font-size: 0.75rem;
   color: var(--color-text-muted);
+}
+
+.album-row-songs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.song-chip {
+  padding: 8px 16px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.song-chip:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-surface-hover);
+  color: var(--color-white);
+}
+
+.song-chip.active {
+  border-color: var(--color-accent);
+  background-color: rgba(78, 168, 181, 0.15);
+  color: var(--color-white);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .album-row {
+    gap: 12px;
+  }
+
+  .album-row-header {
+    min-width: 0;
+    width: 100%;
+  }
 }
 
 /* --- Waveform unloaded state — blur fake waveforms, keep labels/controls sharp --- */
