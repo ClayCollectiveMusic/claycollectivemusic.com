@@ -262,17 +262,17 @@ function seekFromEvent(e, row) {
   }
 }
 
-// --- Download dropdown ---
-function closeDownloadMenus(except) {
-  document.querySelectorAll('.track-download.is-open').forEach(function (el) {
+// --- Track action dropdowns (Listen / Download) ---
+function closeTrackMenus(except) {
+  document.querySelectorAll('.track-menu.is-open').forEach(function (el) {
     if (el === except) return;
     el.classList.remove('is-open');
-    var btn = el.querySelector('.track-dl-btn');
+    var btn = el.querySelector('.track-menu-btn');
     if (btn) btn.setAttribute('aria-expanded', 'false');
   });
 }
 
-// Event delegation — play button + download menu clicks
+// Event delegation — play button + dropdown menu clicks
 document.addEventListener('click', function (e) {
   var playBtn = e.target.closest('.music-play-btn');
   if (playBtn) {
@@ -282,23 +282,23 @@ document.addEventListener('click', function (e) {
     return;
   }
 
-  var downloadBtn = e.target.closest('.track-dl-btn');
-  if (downloadBtn) {
+  var menuBtn = e.target.closest('.track-menu-btn');
+  if (menuBtn) {
     e.preventDefault();
-    var wrap = downloadBtn.closest('.track-download');
+    var wrap = menuBtn.closest('.track-menu');
     var willOpen = !wrap.classList.contains('is-open');
-    closeDownloadMenus(wrap);
+    closeTrackMenus(wrap);
     wrap.classList.toggle('is-open', willOpen);
-    downloadBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    menuBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
     return;
   }
 
   // Clicking a menu item closes the menu; clicking anywhere else closes all.
-  closeDownloadMenus(null);
+  closeTrackMenus(null);
 });
 
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') closeDownloadMenus(null);
+  if (e.key === 'Escape') closeTrackMenus(null);
 });
 
 // Double-click on track row to play/pause

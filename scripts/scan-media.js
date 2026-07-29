@@ -18,7 +18,8 @@
  *         "masterUrl": "https://...",
  *         "spotifyUrl": "https://...",
  *         "youtubeUrl": "https://...",
- *         "appleMusicUrl": "https://..."
+ *         "appleMusicUrl": "https://...",
+ *         "amazonMusicUrl": "https://..."
  *       }
  *     ]
  *   }
@@ -87,6 +88,7 @@ export function scanMedia(mediaDir) {
       const spotifyUrl = meta.spotifyUrl || null;
       const youtubeUrl = meta.youtubeUrl || null;
       const appleMusicUrl = meta.appleMusicUrl || null;
+      const amazonMusicUrl = meta.amazonMusicUrl || null;
 
       // Stems: read from album.json (populated by npm run process-media)
       // Each stem entry has { name, file } where file is the actual mp3 filename
@@ -108,6 +110,7 @@ export function scanMedia(mediaDir) {
         spotifyUrl,
         youtubeUrl,
         appleMusicUrl,
+        amazonMusicUrl,
         stems,
       });
     }

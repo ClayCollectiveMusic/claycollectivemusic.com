@@ -8,6 +8,7 @@
       "spotifyUrl": "https://open.spotify.com/track/4CSbISlJXRzJGEAM6qhyMt?si=e7c8cd622e8841ed",
       "youtubeUrl": "https://www.youtube.com/watch?v=37guHZUKa7g",
       "appleMusicUrl": "https://music.apple.com/us/song/pour-out-your-spirit/1801411782",
+      "amazonMusicUrl": "https://music.amazon.com/albums/B0F137HQGZ?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_BFquGS0G2i3HU2epIiZ4NJ3af&trackAsin=B0F13CD3MM",
       "stems": [
         {
           "name": "ACS GTR",
@@ -180,6 +181,7 @@
       "spotifyUrl": "https://open.spotify.com/track/2NUlMF7w2iM3gR4S2Ro64N?si=c99ccc8f7fd04c11",
       "youtubeUrl": "https://www.youtube.com/watch?v=n1SIadc4jf8",
       "appleMusicUrl": "https://music.apple.com/us/song/awe-and-wonder/1801411784",
+      "amazonMusicUrl": "https://music.amazon.com/albums/B0F137HQGZ?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_xg5T5OsgJm8btJPimJF6bPHjO&trackAsin=B0F1396G6X",
       "stems": [
         {
           "name": "ACS GTR",
@@ -304,6 +306,7 @@
       "spotifyUrl": "https://open.spotify.com/track/5uSZ3t5ku8lyuMyEESNEXO?si=495abf23921943c4",
       "youtubeUrl": "https://www.youtube.com/watch?v=cncywj5ciLc",
       "appleMusicUrl": "https://music.apple.com/us/song/glory-to-the-king/1801411785",
+      "amazonMusicUrl": "https://music.amazon.com/albums/B0F137HQGZ?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_sEGUuljzAuDSfqU4GeQNFtUDp&trackAsin=B0F13823C8",
       "stems": [
         {
           "name": "ACS GTR",
@@ -505,7 +508,8 @@
       "masterUrl": "https://drive.google.com/file/d/1ZV1cxA785fXF5iGxx10nCOze7fLxquzC/view?usp=drive_link",
       "spotifyUrl": "https://open.spotify.com/track/66GoaxYMXIgBs612gCy3nt?si=891501f185c1471b",
       "youtubeUrl": "https://www.youtube.com/watch?v=iSvb71CnBMU",
-      "appleMusicUrl": "https://music.apple.com/us/song/pour-out-your-spirit-acoustic/1801412063"
+      "appleMusicUrl": "https://music.apple.com/us/song/pour-out-your-spirit-acoustic/1801412063",
+      "amazonMusicUrl": "https://music.amazon.com/albums/B0F137HQGZ?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_1CUobo60P7xkGToriXZIruzq0&trackAsin=B0F1388RSS"
     }
   ]
 }

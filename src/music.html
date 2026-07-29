@@ -65,50 +65,60 @@
                                   <%= track.name %>
                                 </span>
                                 <div class="album-track-actions">
-                                  <% if (track.spotifyUrl) { %>
-                                    <a href="<%= track.spotifyUrl %>" target="_blank" rel="noopener"
-                                       class="track-action-btn" title="Listen on Spotify">
-                                      <img src="images/icons/spotify.svg" width="16" height="16" alt="">
+                                  <% if (track.stems.length> 0) { %>
+                                    <a href="player.html?song=<%= album.slug %>--<%= track.slug %>"
+                                       class="track-action-btn" title="Stem Player">
+                                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                        <path
+                                              d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V6h-2v12zm4-8v4h2v-4h-2z" />
+                                      </svg>
                                     </a>
                                     <% } %>
-                                      <% if (track.youtubeUrl) { %>
-                                        <a href="<%= track.youtubeUrl %>" target="_blank" rel="noopener"
-                                           class="track-action-btn" title="Watch on YouTube">
-                                          <img src="images/icons/youtube.svg" width="16" height="16" alt="">
-                                        </a>
+                                  <% if (track.spotifyUrl || track.youtubeUrl || track.appleMusicUrl || track.amazonMusicUrl) { %>
+                                    <div class="track-menu">
+                                      <button type="button" class="track-action-btn track-menu-btn"
+                                              title="Listen" aria-label="Listen" aria-haspopup="true" aria-expanded="false">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                          <path d="M12 3a9 9 0 0 0-9 9v5a3 3 0 0 0 3 3h2v-8H5v0a7 7 0 0 1 14 0v0h-3v8h2a3 3 0 0 0 3-3v-5a9 9 0 0 0-9-9z" />
+                                        </svg>
+                                      </button>
+                                      <div class="track-menu-list" role="menu">
+                                        <% if (track.spotifyUrl) { %>
+                                          <a href="<%= track.spotifyUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/spotify.svg" width="16" height="16" alt="">Spotify</a>
+                                          <% } %>
+                                        <% if (track.youtubeUrl) { %>
+                                          <a href="<%= track.youtubeUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/youtube.svg" width="16" height="16" alt="">YouTube</a>
+                                          <% } %>
+                                        <% if (track.appleMusicUrl) { %>
+                                          <a href="<%= track.appleMusicUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/apple-music.svg" width="16" height="16" alt="">Apple Music</a>
+                                          <% } %>
+                                        <% if (track.amazonMusicUrl) { %>
+                                          <a href="<%= track.amazonMusicUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/amazon-music.svg" width="16" height="16" alt="">Amazon Music</a>
+                                          <% } %>
+                                      </div>
+                                    </div>
+                                    <% } %>
+                                  <div class="track-menu">
+                                    <button type="button" class="track-action-btn track-menu-btn"
+                                            title="Download" aria-label="Download" aria-haspopup="true" aria-expanded="false">
+                                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
+                                      </svg>
+                                    </button>
+                                    <div class="track-menu-list" role="menu">
+                                      <a href="<%= track.mp3Url %>" download role="menuitem">Download mp3</a>
+                                      <% if (track.masterUrl) { %>
+                                        <a href="<%= track.masterUrl %>" target="_blank" rel="noopener" role="menuitem">Download master</a>
                                         <% } %>
-                                      <% if (track.appleMusicUrl) { %>
-                                        <a href="<%= track.appleMusicUrl %>" target="_blank" rel="noopener"
-                                           class="track-action-btn" title="Listen on Apple Music">
-                                          <img src="images/icons/apple-music.svg" width="16" height="16" alt="">
-                                        </a>
+                                      <% if (track.stemsLink) { %>
+                                        <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" role="menuitem">Download stems</a>
                                         <% } %>
-                                      <% if (track.stems.length> 0) { %>
-                                        <a href="player.html?song=<%= album.slug %>--<%= track.slug %>"
-                                           class="track-action-btn" title="Stem Player">
-                                          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                            <path
-                                                  d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V6h-2v12zm4-8v4h2v-4h-2z" />
-                                          </svg>
-                                        </a>
-                                        <% } %>
-                                          <div class="track-download">
-                                            <button type="button" class="track-action-btn track-dl-btn"
-                                                    title="Download" aria-label="Download" aria-haspopup="true" aria-expanded="false">
-                                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                                <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
-                                              </svg>
-                                            </button>
-                                            <div class="track-download-menu" role="menu">
-                                              <a href="<%= track.mp3Url %>" download role="menuitem">Download mp3</a>
-                                              <% if (track.masterUrl) { %>
-                                                <a href="<%= track.masterUrl %>" target="_blank" rel="noopener" role="menuitem">Download master</a>
-                                                <% } %>
-                                              <% if (track.stemsLink) { %>
-                                                <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" role="menuitem">Download stems</a>
-                                                <% } %>
-                                            </div>
-                                          </div>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                               <div class="music-progress-bar">
