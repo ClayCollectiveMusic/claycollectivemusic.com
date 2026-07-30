@@ -292,6 +292,10 @@ function selectSong(key) {
       volume: 1,
       peaks: null,
       canvas: null,
+      // Prerendered waveform SVG (from R2). When present the track renders as a
+      // CSS mask and never needs peaks decoded or a per-frame redraw.
+      waveformUrl: stem.waveformUrl || '',
+      playedEl: null,
       loaded: false
     });
   });
@@ -526,23 +530,49 @@ function drawFakeWaveform(canvas, rgb) {
 
 function renderAllFakeWaveforms() {
   tracks.forEach(function (track) {
+    // Prerendered tracks already show their real waveform — no placeholder needed.
     if (track.canvas) {
       drawFakeWaveform(track.canvas, getCategoryColor(track.category));
     }
   });
 }
 
+/**
+ * Advances every track's played/unplayed split.
+ *
+ * For prerendered (mask) tracks this is a single CSS custom-property write, which
+ * the compositor handles — no raster work. For canvas tracks it's a full redraw of
+ * every bar, which is why this used to be the player's dominant cost: with 50
+ * stems it ran 50 canvas redraws per frame, 60 times a second (~30ms/frame,
+ * ~180% of the frame budget).
+ */
 function renderAllWaveforms(pct) {
+  var p = pct || 0;
   tracks.forEach(function (track) {
-    if (track.canvas && track.peaks) {
-      drawWaveform(track.canvas, track.peaks, pct || 0, getCategoryColor(track.category));
+    if (track.playedEl) {
+      track.playedEl.style.setProperty('--played', (Math.max(0, Math.min(1, p)) * 100) + '%');
+    } else if (track.canvas && track.peaks) {
+      drawWaveform(track.canvas, track.peaks, p, getCategoryColor(track.category));
     }
   });
 }
 
+/**
+ * The element occupying a track's waveform column, whichever rendering path is in
+ * use: a <canvas> for decoded peaks, or the mask div for a prerendered SVG.
+ *
+ * Callers need this for geometry (playhead position, seek hit-testing). Using
+ * `track.canvas` directly is a bug now that prerendered tracks have canvas=null —
+ * the measurement silently falls back to the whole waveform area, which is wider
+ * than the waveform column and throws off both the playhead and seeking.
+ */
+function getTrackWaveformEl(track) {
+  return track ? (track.canvas || track.playedEl) : null;
+}
+
 function updatePlayhead(pct) {
-  // Position playhead relative to the canvas column, not the full waveform-area
-  var firstCanvas = tracks.length > 0 && tracks[0].canvas;
+  // Position playhead relative to the waveform column, not the full waveform-area
+  var firstCanvas = tracks.length > 0 && getTrackWaveformEl(tracks[0]);
   if (firstCanvas) {
     var areaRect = waveformArea.getBoundingClientRect();
     var canvasRect = firstCanvas.getBoundingClientRect();
@@ -665,7 +695,12 @@ async function onSongChange(songKey, autoPlay) {
         .then(function (buffer) {
           if (loadGeneration !== myGeneration) return;
           tracks[i].buffer = buffer;
-          tracks[i].peaks = getPeaks(buffer, WAVEFORM_SAMPLES);
+          // Only extract peaks when there's no prerendered waveform to show.
+          // getPeaks walks every sample of every channel, so skipping it saves
+          // real work per stem — the decoded buffer is still needed for playback.
+          if (!tracks[i].waveformUrl) {
+            tracks[i].peaks = getPeaks(buffer, WAVEFORM_SAMPLES);
+          }
           stemDecoded[i] = true;
           updateProgress();
           tracks[i].loaded = true;
@@ -717,14 +752,16 @@ async function onSongChange(songKey, autoPlay) {
             tracks[i].loadingBar.remove();
             tracks[i].loadingBar = null;
           }
-          if (tracks[i].canvas) {
-            var wrap = tracks[i].canvas.parentElement;
-            if (wrap) {
-              var errEl = document.createElement('div');
-              errEl.className = 'track-error';
-              errEl.textContent = 'Failed to load';
-              wrap.appendChild(errEl);
-            }
+          // Show the error on the row regardless of rendering path. Guarding this
+          // on `canvas` meant prerendered tracks failed silently, leaving only the
+          // summary message with no indication of which stem broke.
+          var failEl = getTrackWaveformEl(tracks[i]);
+          var wrap = failEl ? failEl.parentElement : null;
+          if (wrap && !wrap.querySelector('.track-error')) {
+            var errEl = document.createElement('div');
+            errEl.className = 'track-error';
+            errEl.textContent = 'Failed to load';
+            wrap.appendChild(errEl);
           }
         });
     })
@@ -852,8 +889,8 @@ function getCurrentTime() {
 
 // --- Seek ---
 function seekToEvent(e) {
-  // Calculate pct relative to the canvas column, not the full waveform-area
-  var firstCanvas = tracks.length > 0 && tracks[0].canvas;
+  // Calculate pct relative to the waveform column, not the full waveform-area
+  var firstCanvas = tracks.length > 0 && getTrackWaveformEl(tracks[0]);
   var rect;
   if (firstCanvas) {
     rect = firstCanvas.getBoundingClientRect();
@@ -959,18 +996,45 @@ function renderTracks() {
         '<button class="track-btn-mute" data-action="mute" data-index="' + i + '" aria-label="Mute" title="Mute">M</button>' +
         '<button class="track-btn-solo" data-action="solo" data-index="' + i + '" aria-label="Solo" title="Solo">S</button>';
 
-      // Waveform canvas with overlaid label
+      // Waveform with overlaid label
       var canvasWrap = document.createElement('div');
       canvasWrap.className = 'track-waveform';
       var label = document.createElement('span');
       label.className = 'track-label';
       label.textContent = track.name;
-      var canvas = document.createElement('canvas');
-      canvas.height = TRACK_HEIGHT * (window.devicePixelRatio || 1);
-      canvas.width = 800;
       canvasWrap.appendChild(label);
-      canvasWrap.appendChild(canvas);
-      track.canvas = canvas;
+
+      if (track.waveformUrl) {
+        // Prerendered waveform: two mask layers tinted by category color. Costs
+        // one rasterization, then nothing — no per-frame redraw, unlike canvas.
+        var rgb = getCategoryColor(track.category);
+        var maskUrl = "url('" + track.waveformUrl + "')";
+
+        var base = document.createElement('div');
+        base.className = 'stem-waveform';
+        base.style.backgroundColor = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.4)';
+        base.style.webkitMaskImage = maskUrl;
+        base.style.maskImage = maskUrl;
+
+        var playedEl = document.createElement('div');
+        playedEl.className = 'stem-waveform-played';
+        playedEl.style.backgroundColor = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+        playedEl.style.webkitMaskImage = maskUrl;
+        playedEl.style.maskImage = maskUrl;
+
+        canvasWrap.appendChild(base);
+        canvasWrap.appendChild(playedEl);
+        track.playedEl = playedEl;
+        track.canvas = null;
+      } else {
+        // Fallback: draw into a canvas from peaks decoded in the browser.
+        var canvas = document.createElement('canvas');
+        canvas.height = TRACK_HEIGHT * (window.devicePixelRatio || 1);
+        canvas.width = 800;
+        canvasWrap.appendChild(canvas);
+        track.canvas = canvas;
+        track.playedEl = null;
+      }
       // Loading bar for unloaded tracks — colored to match waveform category
       if (!track.loaded) {
         var loadBar = document.createElement('div');

@@ -125,6 +125,19 @@
                                 </div>
                               </div>
                               <div class="music-progress-bar">
+                                <% if (track.waveformUrl) { %>
+                                  <%
+                                    /* Prerendered waveform, used as a CSS mask so the color is
+                                       controlled by the stylesheet. Two layers: the dim unplayed
+                                       base and the bright played portion, revealed via clip-path.
+                                       Rasterizes once — progress never redraws it. */
+                                    var wfMask = "url('" + track.waveformUrl + "')";
+                                  %>
+                                  <div class="music-waveform" data-waveform
+                                       style="-webkit-mask-image: <%= wfMask %>; mask-image: <%= wfMask %>"></div>
+                                  <div class="music-waveform-played" data-waveform-played
+                                       style="-webkit-mask-image: <%= wfMask %>; mask-image: <%= wfMask %>"></div>
+                                  <% } %>
                                 <div class="music-progress-fill"></div>
                               </div>
                         </div>

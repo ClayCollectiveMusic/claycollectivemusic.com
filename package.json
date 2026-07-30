@@ -5,10 +5,11 @@
     "dev": "vite --host",
     "start": "vite --host",
     "build": "vite build",
-    "process-media": "tsx scripts/process-media.ts",
-    "r2:push": "tsx scripts/sync-r2.ts --push",
-    "r2:pull": "tsx scripts/sync-r2.ts --pull",
-    "media": "npm run r2:pull && npm run process-media && npm run r2:push"
+    "media": "npm run media:process && npm run media:upload",
+    "media:download": "tsx scripts/sync-r2.ts --pull",
+    "media:process": "tsx scripts/process-media.ts",
+    "media:upload": "tsx scripts/sync-r2.ts --push --prune",
+    "media:upload:dry-run": "tsx scripts/sync-r2.ts --push --prune --dry-run"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.967.0",

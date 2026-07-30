@@ -23,12 +23,6 @@
           "fileSize": 13266492
         },
         {
-          "name": "Bass Guitar",
-          "file": "Pour out Your Spirit - Bass Guitar.mp3",
-          "folder": "01 - Pour out Your Spirit",
-          "fileSize": 13266492
-        },
-        {
           "name": "Background Vocals 1",
           "file": "Pour out Your Spirit - Background Vocals 1.mp3",
           "folder": "01 - Pour out Your Spirit",
@@ -49,6 +43,12 @@
         {
           "name": "Background Vocals 4",
           "file": "Pour out Your Spirit - Background Vocals 4.mp3",
+          "folder": "01 - Pour out Your Spirit",
+          "fileSize": 13266492
+        },
+        {
+          "name": "Bass Guitar",
+          "file": "Pour out Your Spirit - Bass Guitar.mp3",
           "folder": "01 - Pour out Your Spirit",
           "fileSize": 13266492
         },
@@ -190,14 +190,14 @@
           "fileSize": 9474492
         },
         {
-          "name": "Bass Guitar",
-          "file": "Awe and Wonder - Bass Guitar.mp3",
+          "name": "Background Vocals 1",
+          "file": "Awe and Wonder - Background Vocals 1.mp3",
           "folder": "02 - Awe and Wonder",
           "fileSize": 9474492
         },
         {
-          "name": "Background Vocals 1",
-          "file": "Awe and Wonder - Background Vocals 1.mp3",
+          "name": "Bass Guitar",
+          "file": "Awe and Wonder - Bass Guitar.mp3",
           "folder": "02 - Awe and Wonder",
           "fileSize": 9474492
         },
@@ -315,12 +315,6 @@
           "fileSize": 11225532
         },
         {
-          "name": "Bass Guitar",
-          "file": "Glory to the King - Bass Guitar.mp3",
-          "folder": "03 - Glory to the King",
-          "fileSize": 11225532
-        },
-        {
           "name": "Background Vocals 1",
           "file": "Glory to the King - Background Vocals 1.mp3",
           "folder": "03 - Glory to the King",
@@ -329,6 +323,12 @@
         {
           "name": "Background Vocals 2",
           "file": "Glory to the King - Background Vocals 2.mp3",
+          "folder": "03 - Glory to the King",
+          "fileSize": 11225532
+        },
+        {
+          "name": "Bass Guitar",
+          "file": "Glory to the King - Bass Guitar.mp3",
           "folder": "03 - Glory to the King",
           "fileSize": 11225532
         },
@@ -441,14 +441,14 @@
           "fileSize": 11225532
         },
         {
-          "name": "Pad 2",
-          "file": "Glory to the King - Pad 2.mp3",
+          "name": "Pad 1",
+          "file": "Glory to the King - Pad 1.mp3",
           "folder": "03 - Glory to the King",
           "fileSize": 11225532
         },
         {
-          "name": "Pad 1",
-          "file": "Glory to the King - Pad 1.mp3",
+          "name": "Pad 2",
+          "file": "Glory to the King - Pad 2.mp3",
           "folder": "03 - Glory to the King",
           "fileSize": 11225532
         },
@@ -459,14 +459,14 @@
           "fileSize": 11225532
         },
         {
-          "name": "Piano 2",
-          "file": "Glory to the King - Piano 2.mp3",
+          "name": "Piano 1",
+          "file": "Glory to the King - Piano 1.mp3",
           "folder": "03 - Glory to the King",
           "fileSize": 11225532
         },
         {
-          "name": "Piano 1",
-          "file": "Glory to the King - Piano 1.mp3",
+          "name": "Piano 2",
+          "file": "Glory to the King - Piano 2.mp3",
           "folder": "03 - Glory to the King",
           "fileSize": 11225532
         },

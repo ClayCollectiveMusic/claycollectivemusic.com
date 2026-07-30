@@ -27,8 +27,25 @@
 
 import fs from 'fs';
 import path from 'path';
+import { WAVEFORM_SUFFIX } from './generate-waveforms.js';
 
 const R2_BASE_URL = 'https://cdn.claycollectivemusic.com';
+
+/**
+ * Builds a CDN URL from path segments, percent-encoding each one.
+ *
+ * Every segment MUST be encoded. Album and stem names contain spaces and
+ * parentheses ("Living Stones (2021)"), which are not legal in a URL. Attribute
+ * contexts hide this — browsers silently fix up `<img src>` and `<a href>` — but
+ * `fetch()` and CSS `url()` do not, so the multitrack player's fetch() of every
+ * stem failed outright while the same links worked elsewhere on the page.
+ *
+ * encodeURIComponent (not encodeURI) because segment names can contain '#', '?'
+ * and '&', which encodeURI would leave intact and corrupt the path.
+ */
+function mediaUrl(...segments) {
+  return `${R2_BASE_URL}/media/` + segments.map(encodeURIComponent).join('/');
+}
 
 export function scanMedia(mediaDir) {
   if (!fs.existsSync(mediaDir)) return [];
@@ -52,7 +69,7 @@ export function scanMedia(mediaDir) {
     const slug = slugify(albumName);
 
     // Album art — served from R2
-    const artUrl = `${R2_BASE_URL}/media/${dirName}/folder.jpg`;
+    const artUrl = mediaUrl(dirName, 'folder.jpg');
 
     // album.json is required — it's the source of truth for tracks
     const albumJsonPath = path.join(albumPath, 'album.json');
@@ -81,7 +98,21 @@ export function scanMedia(mediaDir) {
       const trackNumStr = String(trackNum).padStart(2, '0');
       const trackSlug = slugify(trackName);
       const fileName = `${trackNumStr} - ${trackName}.mp3`;
-      const mp3Url = `${R2_BASE_URL}/media/${dirName}/tracks/${fileName}`;
+      const mp3Url = mediaUrl(dirName, 'tracks', fileName);
+
+      // Prerendered waveform image, generated at ingestion by
+      // `npm run media:process` and served from R2 alongside the audio.
+      // Presence is checked against the LOCAL file (R2 isn't reachable at build
+      // time); null when absent, and the client then falls back to decoding the
+      // mp3 on demand. A missing waveform after adding audio means the R2 push
+      // hasn't run yet.
+      // URL-encode each path segment: album/track names contain spaces and
+      // parentheses, which break an unquoted CSS url() and are invalid in a URL.
+      const svgFileName = fileName.replace(/\.mp3$/i, WAVEFORM_SUFFIX);
+      const hasWaveform = fs.existsSync(path.join(albumPath, 'tracks', svgFileName));
+      const waveformUrl = hasWaveform
+        ? mediaUrl(dirName, 'tracks', svgFileName)
+        : null;
 
       const stemsLink = meta.stemsUrl || meta.stemsLink || null;
       const masterUrl = meta.masterUrl || null;
@@ -90,15 +121,26 @@ export function scanMedia(mediaDir) {
       const appleMusicUrl = meta.appleMusicUrl || null;
       const amazonMusicUrl = meta.amazonMusicUrl || null;
 
-      // Stems: read from album.json (populated by npm run process-media)
+      // Stems: read from album.json (populated by npm run media:process)
       // Each stem entry has { name, file } where file is the actual mp3 filename
       const metaStems = meta.stems || [];
       const stemFolderName = `${trackNumStr} - ${trackName}`;
-      const stems = metaStems.map(stem => ({
-        name: stem.name,
-        url: `${R2_BASE_URL}/media/${dirName}/stems/${stem.folder || stemFolderName}/${stem.file}`,
-        fileSize: stem.fileSize || 0,
-      }));
+      const stems = metaStems.map(stem => {
+        const folder = stem.folder || stemFolderName;
+        // Per-stem waveform, same convention as tracks: <stem>.peaks.svg next to the mp3.
+        const stemSvg = stem.file.replace(/\.mp3$/i, WAVEFORM_SUFFIX);
+        const hasStemWaveform = fs.existsSync(
+          path.join(albumPath, 'stems', folder, stemSvg)
+        );
+        return {
+          name: stem.name,
+          url: mediaUrl(dirName, 'stems', folder, stem.file),
+          waveformUrl: hasStemWaveform
+            ? mediaUrl(dirName, 'stems', folder, stemSvg)
+            : null,
+          fileSize: stem.fileSize || 0,
+        };
+      });
 
       tracks.push({
         num: trackNum,
@@ -112,6 +154,7 @@ export function scanMedia(mediaDir) {
         appleMusicUrl,
         amazonMusicUrl,
         stems,
+        waveformUrl,
       });
     }
 
@@ -173,6 +216,7 @@ export function generatePlayerData(albums) {
           name: s.name,
           url: s.url,
           downloadUrl: s.url,
+          waveformUrl: s.waveformUrl || '',
           fileSize: s.fileSize || 0,
         })),
       });

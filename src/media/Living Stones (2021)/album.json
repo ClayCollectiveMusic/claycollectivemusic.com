@@ -8,7 +8,69 @@
       "spotifyUrl": "https://open.spotify.com/track/2gx2bOeynA27F0KLjWMPjI?si=c20ba16d38e34659",
       "youtubeUrl": "https://www.youtube.com/watch?v=GOSBB120l24",
       "appleMusicUrl": "https://music.apple.com/us/song/we-are-yours/1556818200",
-      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_kPXAYH1rhpAtQjRW0wtvnBVQX&trackAsin=B08Y5DHFCN"
+      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_kPXAYH1rhpAtQjRW0wtvnBVQX&trackAsin=B08Y5DHFCN",
+      "stems": [
+        {
+          "name": "Acoustic Guitar",
+          "file": "We Are Yours - Acoustic Guitar.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Bass",
+          "file": "We Are Yours - Bass.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Click",
+          "file": "We Are Yours - Click.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Drums",
+          "file": "We Are Yours - Drums.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Electric Guitar 1",
+          "file": "We Are Yours - Electric Guitar 1.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Electric Guitar 2",
+          "file": "We Are Yours - Electric Guitar 2.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Gang Vocals",
+          "file": "We Are Yours - Gang Vocals.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Keys",
+          "file": "We Are Yours - Keys.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Synth",
+          "file": "We Are Yours - Synth.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        },
+        {
+          "name": "Vocals",
+          "file": "We Are Yours - Vocals.mp3",
+          "folder": "01 - We Are Yours",
+          "fileSize": 12554171
+        }
+      ]
     },
     {
       "name": "Forever and Always",
@@ -17,7 +79,75 @@
       "spotifyUrl": "https://open.spotify.com/track/1AcWDxGuBeLSF680r7pQcc?si=2431d110c1cc415b",
       "youtubeUrl": "https://www.youtube.com/watch?v=znrgYvehqbc",
       "appleMusicUrl": "https://music.apple.com/us/song/forever-and-always/1556818543",
-      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_EvnKvhXeQY6V6pzzeGSJrVtIK&trackAsin=B08Y5HFY9Q"
+      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_EvnKvhXeQY6V6pzzeGSJrVtIK&trackAsin=B08Y5HFY9Q",
+      "stems": [
+        {
+          "name": "Acoustic Guitar",
+          "file": "Forever and Always - Acoustic Guitar.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Ahhs",
+          "file": "Forever and Always - Ahhs.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Bass",
+          "file": "Forever and Always - Bass.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Click",
+          "file": "Forever and Always - Click.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Drums",
+          "file": "Forever and Always - Drums.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Electric Guitar 1",
+          "file": "Forever and Always - Electric Guitar 1.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Electric Guitar 2",
+          "file": "Forever and Always - Electric Guitar 2.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Gang Vocals",
+          "file": "Forever and Always - Gang Vocals.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Keys",
+          "file": "Forever and Always - Keys.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Synth",
+          "file": "Forever and Always - Synth.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        },
+        {
+          "name": "Vocals",
+          "file": "Forever and Always - Vocals.mp3",
+          "folder": "02 - Forever and Always",
+          "fileSize": 13291451
+        }
+      ]
     },
     {
       "name": "Freedom",
@@ -26,7 +156,63 @@
       "spotifyUrl": "https://open.spotify.com/track/06TFhGEPikKgSwZ6ENjUm0?si=11ffda6c664242a5",
       "youtubeUrl": "https://www.youtube.com/watch?v=ah8SyRfLH48",
       "appleMusicUrl": "https://music.apple.com/us/song/freedom/1556818549",
-      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_hAJJJhqhHkZzkbs2nsYO97YQC&trackAsin=B08Y5NMQ7F"
+      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_hAJJJhqhHkZzkbs2nsYO97YQC&trackAsin=B08Y5NMQ7F",
+      "stems": [
+        {
+          "name": "Acoustic Guitar",
+          "file": "Freedom - Acoustic Guitar.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Ahhs",
+          "file": "Freedom - Ahhs.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Bass",
+          "file": "Freedom - Bass.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Click",
+          "file": "Freedom - Click.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Drums",
+          "file": "Freedom - Drums.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Electric Guitar",
+          "file": "Freedom - Electric Guitar.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Percussion",
+          "file": "Freedom - Percussion.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Synth",
+          "file": "Freedom - Synth.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        },
+        {
+          "name": "Vocals",
+          "file": "Freedom - Vocals.mp3",
+          "folder": "03 - Freedom",
+          "fileSize": 10411451
+        }
+      ]
     },
     {
       "name": "Who is this Man",
@@ -35,7 +221,75 @@
       "spotifyUrl": "https://open.spotify.com/track/6Fr6OJccPIILkiOQoe2nP9?si=166f51ec918747fa",
       "youtubeUrl": "https://www.youtube.com/watch?v=y_EIwDdjEu0",
       "appleMusicUrl": "https://music.apple.com/us/song/who-is-this-man/1556818553",
-      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_31l5tFbtoT7VvVjhce6grTzAT&trackAsin=B08Y61BBT4"
+      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_31l5tFbtoT7VvVjhce6grTzAT&trackAsin=B08Y61BBT4",
+      "stems": [
+        {
+          "name": "Acoustic Guitar",
+          "file": "Who is this Man - Acoustic Guitar.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Bass",
+          "file": "Who is this Man - Bass.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Click",
+          "file": "Who is this Man - Click.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Drums",
+          "file": "Who is this Man - Drums.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Electric Guitar 1",
+          "file": "Who is this Man - Electric Guitar 1.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Electric Guitar 2",
+          "file": "Who is this Man - Electric Guitar 2.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Gang Vocals",
+          "file": "Who is this Man - Gang Vocals.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Keys",
+          "file": "Who is this Man - Keys.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Strings",
+          "file": "Who is this Man - Strings.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Synth",
+          "file": "Who is this Man - Synth.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        },
+        {
+          "name": "Vocals",
+          "file": "Who is this Man - Vocals.mp3",
+          "folder": "04 - Who is this Man",
+          "fileSize": 12211451
+        }
+      ]
     },
     {
       "name": "Worthy Lord",
@@ -44,7 +298,69 @@
       "spotifyUrl": "https://open.spotify.com/track/4GmhZc4NOzlKXj5idhESMT?si=88d5c7a578e643eb",
       "youtubeUrl": "https://www.youtube.com/watch?v=cmYCB3cxqVU",
       "appleMusicUrl": "https://music.apple.com/us/song/worthy-lord/1556818561",
-      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_QkSl4yAQi9eXWqEYv2cwPxaiq&trackAsin=B08Y5S83B3"
+      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_QkSl4yAQi9eXWqEYv2cwPxaiq&trackAsin=B08Y5S83B3",
+      "stems": [
+        {
+          "name": "Acoustic Guitar",
+          "file": "Worthy Lord - Acoustic Guitar.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Bass",
+          "file": "Worthy Lord - Bass.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Click",
+          "file": "Worthy Lord - Click.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Drums",
+          "file": "Worthy Lord - Drums.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Electric Guitar 1",
+          "file": "Worthy Lord - Electric Guitar 1.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Electric Guitar 2",
+          "file": "Worthy Lord - Electric Guitar 2.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Gang Vocals",
+          "file": "Worthy Lord - Gang Vocals.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Keys",
+          "file": "Worthy Lord - Keys.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Synth",
+          "file": "Worthy Lord - Synth.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        },
+        {
+          "name": "Vocals",
+          "file": "Worthy Lord - Vocals.mp3",
+          "folder": "05 - Worthy Lord",
+          "fileSize": 10382651
+        }
+      ]
     },
     {
       "name": "Kindness",
@@ -53,7 +369,75 @@
       "spotifyUrl": "https://open.spotify.com/track/57wn1vQCFFoNrZDUCHHWFw?si=6e6595e8c52b44b0",
       "youtubeUrl": "https://www.youtube.com/watch?v=sAs6Gf269Yw",
       "appleMusicUrl": "https://music.apple.com/us/song/kindness/1556818836",
-      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_REfdgjpqfkf9RqJEZOxWpuTwt&trackAsin=B08Y5NDMG1"
+      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_REfdgjpqfkf9RqJEZOxWpuTwt&trackAsin=B08Y5NDMG1",
+      "stems": [
+        {
+          "name": "Acoustic Guitar",
+          "file": "Kindness - Acoustic Guitar.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Bass",
+          "file": "Kindness - Bass.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Click",
+          "file": "Kindness - Click.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Drums",
+          "file": "Kindness - Drums.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Electric Guitar 1",
+          "file": "Kindness - Electric Guitar 1.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Electric Guitar 2",
+          "file": "Kindness - Electric Guitar 2.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Gang Vocals",
+          "file": "Kindness - Gang Vocals.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Keys",
+          "file": "Kindness - Keys.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Strings",
+          "file": "Kindness - Strings.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Synth",
+          "file": "Kindness - Synth.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        },
+        {
+          "name": "Vocals",
+          "file": "Kindness - Vocals.mp3",
+          "folder": "06 - Kindness",
+          "fileSize": 12268089
+        }
+      ]
     },
     {
       "name": "I Will Rise",
@@ -62,7 +446,33 @@
       "spotifyUrl": "https://open.spotify.com/track/0GEVsVMuZjznZBzNeHCArG?si=f64b7150639f404f",
       "youtubeUrl": "https://www.youtube.com/watch?v=z5HILvO3Wjc",
       "appleMusicUrl": "https://music.apple.com/us/song/i-will-rise/1556818840",
-      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_xmSkmzcMaYXdZQv2joFxosZAi&trackAsin=B08Y5HHJQB"
+      "amazonMusicUrl": "https://music.amazon.com/albums/B08Y56B2NY?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_xmSkmzcMaYXdZQv2joFxosZAi&trackAsin=B08Y5HHJQB",
+      "stems": [
+        {
+          "name": "Ahhs",
+          "file": "I Will Rise - Ahhs.mp3",
+          "folder": "07 - I Will Rise",
+          "fileSize": 10947131
+        },
+        {
+          "name": "Click",
+          "file": "I Will Rise - Click.mp3",
+          "folder": "07 - I Will Rise",
+          "fileSize": 10947131
+        },
+        {
+          "name": "Keys",
+          "file": "I Will Rise - Keys.mp3",
+          "folder": "07 - I Will Rise",
+          "fileSize": 10947131
+        },
+        {
+          "name": "Vocals",
+          "file": "I Will Rise - Vocals.mp3",
+          "folder": "07 - I Will Rise",
+          "fileSize": 10947131
+        }
+      ]
     }
   ]
 }

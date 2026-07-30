@@ -85,11 +85,9 @@ function drawWaveform(canvas, peaks, playbackPct) {
   var bars = Math.max(1, Math.min(peaks.length, Math.floor(w / WAVEFORM_BAR_PX)));
   var barW = w / bars;
   var perBar = peaks.length / bars;
-  // Snap each bar to whole device pixels and butt it against the next one. Using
-  // a fractional width here is what left faint gaps: the canvas antialiases a
-  // 2.6px-wide rect into a solid core with translucent edges, reading as a seam.
-  var gap = barW > 3 ? 1 : 0;
-
+  // No gap between bars: each peak represents the wave itself, so a gap just
+  // discards signal. Bars are snapped to whole device pixels and butted directly
+  // against each other, forming a continuous envelope.
   for (var i = 0; i < bars; i++) {
     var from = Math.floor(i * perBar);
     var to = Math.min(peaks.length, Math.max(from + 1, Math.floor((i + 1) * perBar)));
@@ -104,7 +102,7 @@ function drawWaveform(canvas, peaks, playbackPct) {
     var barH = Math.max(1, peak * h * 0.95);
     var y = (h - barH) / 2;
     ctx.fillStyle = (x + barW) <= splitX ? colorPlayed : colorUnplayed;
-    ctx.fillRect(x, y, Math.max(1, xNext - x - gap), barH);
+    ctx.fillRect(x, y, Math.max(1, xNext - x), barH);
   }
 }
 
@@ -174,9 +172,32 @@ function renderWaveform(row, peaks, attemptsLeft) {
   drawWaveform(canvas, peaks, pct);
 }
 
+// --- Prerendered waveform (mask-based) ---
+// Rows whose track had a waveform SVG at build time get two mask layers in the
+// markup. These need no fetch, no decode, and no redraw — progress is a clip-path
+// on the played layer.
+
+function getPrerendered(row) {
+  return row.querySelector('[data-waveform-played]');
+}
+
+function updatePrerendered(row, pct) {
+  var played = getPrerendered(row);
+  if (!played) return false;
+  var clamped = Math.max(0, Math.min(1, pct));
+  played.style.setProperty('--played', (clamped * 100) + '%');
+  return true;
+}
+
 function loadWaveform(row) {
   var mp3 = row.getAttribute('data-mp3');
   if (!mp3) return;
+
+  // A prerendered waveform is already in the DOM — nothing to download or decode.
+  if (getPrerendered(row)) {
+    updatePrerendered(row, audio.duration ? audio.currentTime / audio.duration : 0);
+    return;
+  }
 
   // Already cached
   if (waveformCache[mp3] && waveformCache[mp3].peaks) {
@@ -245,7 +266,9 @@ function updateProgress() {
   var mp3 = activeRow.getAttribute('data-mp3');
   var cached = mp3 && waveformCache[mp3];
 
-  if (cached && cached.peaks && cached.canvas) {
+  if (updatePrerendered(activeRow, pct)) {
+    // Prerendered waveform — progress is a clip-path, nothing to redraw.
+  } else if (cached && cached.peaks && cached.canvas) {
     drawWaveform(cached.canvas, cached.peaks, pct);
   } else {
     // Fallback to fill bar if waveform not ready
@@ -260,6 +283,7 @@ function resetRow(r) {
   r.classList.remove('is-playing');
   r.classList.remove('has-played');
   removeCanvasFromRow(r);
+  updatePrerendered(r, 0);
   var fill = r.querySelector('.music-progress-fill');
   if (fill) fill.style.width = '0%';
 }
@@ -331,7 +355,9 @@ function seekFromEvent(e, row) {
     audio.currentTime = pct * audio.duration;
     var mp3 = row.getAttribute('data-mp3');
     var cached = mp3 && waveformCache[mp3];
-    if (cached && cached.peaks && cached.canvas) {
+    if (updatePrerendered(row, pct)) {
+      // Prerendered waveform — clip-path handles it.
+    } else if (cached && cached.peaks && cached.canvas) {
       drawWaveform(cached.canvas, cached.peaks, pct);
     } else {
       var fill = row.querySelector('.music-progress-fill');
@@ -461,6 +487,8 @@ audio.addEventListener('ended', function () {
 // Handle resize / rotation — re-measure and redraw the active waveform
 function handleWaveformResize() {
   if (!activeRow) return;
+  // Prerendered waveforms are masks sized in percentages — they rescale for free.
+  if (getPrerendered(activeRow)) return;
   var mp3 = activeRow.getAttribute('data-mp3');
   var cached = mp3 && waveformCache[mp3];
   if (!cached || !cached.peaks) return;

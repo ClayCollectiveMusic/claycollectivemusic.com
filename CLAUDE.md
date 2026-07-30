@@ -29,18 +29,24 @@ src/                        # Vite root
     head.ejs                 # <head> partial (meta, CSS link)
     nav.ejs                  # Navigation bar
     footer.ejs               # Site footer
-  media/                     # Music files (committed to git)
+  media/                     # NOT in git — .gitignore has `src/media/**` and
+                             # re-includes ONLY album.json. Audio/wav/svg are
+                             # local-only; the mp3s and svgs live on R2.
     <Album Name> (<Year>)/
       folder.jpg             # Album art
-      album.json             # Optional per-track metadata (stemsLink, etc.)
+      album.json             # <- the only tracked file in here
       tracks/
-        01 - Track Name.mp3  # Full track MP3s
+        01 - Track Name.mp3        # Full track MP3s
+        01 - Track Name.peaks.svg  # Prerendered waveform (generated)
       stems/
         01 - Track Name/     # Stem folder per track
-          SongName_INSTRUMENT.mp3
+          Song - Instrument.wav        # Master (kept as source of truth, never uploaded)
+          Song - Instrument.mp3        # Derived, uploaded to R2
+          Song - Instrument.peaks.svg  # Prerendered waveform (generated)
 
 scripts/
-  process-media.ts           # Creates missing album.json files, converts .wav to .mp3 via ffmpeg, deletes originals
+  process-media.ts           # Creates missing album.json, converts .wav to .mp3 via
+                             # ffmpeg (KEEPS the .wav originals), then generates waveforms
   scan-media.js               # Build-time media scanner (imported by vite.config.js — not a manual-run script, but build tooling, so it lives outside src/)
 
 public/
@@ -61,11 +67,49 @@ src/site.json                # Global site config (name, tagline, social links, 
 - Reads optional `album.json` for metadata (stemsUrl, masterUrl — Google Drive links)
 - Returns structured album/track/stem data used by EJS templates
 
+### Prerendered Waveforms (the important one)
+Waveforms are **generated at ingestion, not in the browser**. `scripts/generate-waveforms.js`
+runs ffmpeg over every track and stem mp3 and writes a sibling `<name>.peaks.svg`
+(the suffix is exported as `WAVEFORM_SUFFIX` — `scan-media.js` imports it rather than
+hardcoding the extension, so the two can't drift).
+
+- **Orphan pruning.** After rendering, the script deletes any `.peaks.svg` with no
+  matching mp3, plus legacy `<name>.svg` files sitting next to a `<name>.mp3`. Without
+  this, renamed/removed audio leaves dead waveforms that the R2 push keeps re-uploading
+  and never removes. Hand-authored SVGs elsewhere in the media tree are untouched — only
+  `tracks/` and `stems/<track>/` directories are scanned, and a bare `.svg` is removed
+  only when its sibling mp3 exists.
+
+- **Style/resolution:** `barsCrisp` at 2000 bars. Chosen by measurement — see the big
+  comment block above `STYLES` in that file for the full table. Two rules that matter:
+  `shape-rendering="crispEdges"` makes filled shapes ~130x cheaper to rasterize, and
+  **any `stroke`-based style is disqualified** (~197ms vs ~1.6ms, and crispEdges does
+  NOT help strokes). Don't change the style without re-measuring.
+- **Rendered as a CSS `mask-image`, not an `<img>`.** The SVG is monochrome black; color
+  comes from `background-color`. This is required for the stems player, which tints each
+  track by category (`getCategoryColor`) — an `<img>` can't be recolored by CSS.
+- **Progress is a `clip-path`** on a second mask layer, driven by the `--played` custom
+  property. The waveform rasterizes once and never redraws.
+- **URLs must be `encodeURIComponent`'d per segment.** Album/track names contain spaces
+  and parentheses; a raw CSS `url()` silently fails on them (unlike `src`/`href`, which
+  browsers auto-encode).
+- **Fallback is intact:** no `waveformUrl` → the old fetch-mp3-and-decode canvas path
+  runs unchanged. That's what happens for any file whose `.svg` hasn't been generated.
+- Off-screen rows use `content-visibility: auto` to defer rasterization (`loading="lazy"`
+  isn't available — these are divs with masks, not images).
+
+Why: the old path downloaded the mp3 a *second* time and ran `decodeAudioData` on it
+(~84MB of PCM per track) purely to draw a waveform. That broke mobile Chrome. It also
+redrew every canvas every animation frame — at 50 stems, ~30ms/frame (~180% of the frame
+budget). Both costs are now gone.
+
 ### Multitrack Stem Player (DAW-style)
 `src/js/player.js` uses the **Web Audio API** to play multiple stems simultaneously.
 - Song data is inlined at build time via `window.PLAYER_SONGS` global (set in player.html)
 - Features: play/pause, seek, per-track solo/mute with circular buttons
-- **Waveform visualization**: each track renders its AudioBuffer data on an HTML5 Canvas
+- **Waveform visualization**: prerendered SVG mask per stem (see above); falls back to
+  drawing AudioBuffer peaks on a Canvas when no SVG exists. `getPeaks()` is skipped
+  entirely for stems that have a prerendered waveform.
 - **Vertical playhead**: a single white line spans all tracks, with a time tooltip above it
 - **Seeking**: clicking anywhere in the waveform area seeks to that position
 - **Transport bar**: circular outline play/pause button + time display
@@ -83,7 +127,23 @@ src/site.json                # Global site config (name, tagline, social links, 
 ## Commands
 - `npm run dev` — Start Vite dev server (auto-opens browser)
 - `npm run build` — Build to `dist/`
-- `npm run process-media` — Create missing album.json, convert .wav files to .mp3 (requires ffmpeg)
+
+### Media
+**`npm run media:sync`** is the one to run — it does all three steps below, in order.
+The individual steps exist for when you only need one:
+
+- `npm run media:download` — Pull from R2 anything missing locally. Gets a fresh machine
+  (or one missing files) back into a good state. Never deletes local files.
+- `npm run media:process` — Convert any `.wav` without an `.mp3` sibling (requires
+  ffmpeg), create missing album.json, render waveforms, prune orphaned waveforms.
+  Local only, never touches R2. Keeps the `.wav` originals.
+- `npm run media:upload` — Make R2 match local: upload new *and changed* files (size,
+  then md5-vs-ETag) and **delete remote objects with no local counterpart**.
+  **Local files are never deleted.**
+  - `npm run media:upload:dry-run` — Preview exactly that. Changes nothing.
+
+For waveform-specific flags (`--force`, `--verbose`, `--variants`) run the script
+directly: `node scripts/generate-waveforms.js --force`.
 
 ## Deployment
 - **Beta site** auto-deploys via GitHub Actions (`.github/workflows/deploy.yml`) on every push to `master`
@@ -96,6 +156,17 @@ src/site.json                # Global site config (name, tagline, social links, 
 - `gh-pages` — deployed site (GitHub Pages, legacy)
 
 ## Recent Changes
+- **Waveforms renamed `<name>.svg` → `<name>.peaks.svg`.** 159 files renamed locally,
+  uploaded, and the 159 old R2 objects pruned. The suffix lives in one place
+  (`WAVEFORM_SUFFIX`, exported from `generate-waveforms.js`, imported by `scan-media.js`)
+  so the generator and scanner can't drift.
+- **npm scripts renamed and reduced from 7 media commands to 4.** Now three steps —
+  `media:download` / `media:process` / `media:upload` — plus `media:sync` which runs all
+  three in order, and a `media:upload:dry-run`. Replaces the old `process-media`, `media`,
+  `generate-waveforms`, `r2:push`, `r2:push:prune`, `r2:dry-run`, `r2:pull`. Dropped the
+  plain no-prune push (strictly weaker than `media:upload`) and the top-level
+  `generate-waveforms` (already a step in `media:process`; run the script directly for
+  `--force`/`--variants`). Only docs/comments referenced the old names — nothing in CI.
 - **Player song picker is now a two-level album tab strip.** `player.html` used to dump every song as a flat card list (repeating the album name under each), which didn't scale past a few albums. Now: a row of compact `.album-tab` buttons (art + name + `year · N songs`) across the top, and only the **selected** album's songs render below as pill-shaped `.song-chip` buttons, separated by a hairline divider.
   - `generatePlayerData` in `scripts/scan-media.js` emits `albumSlug` (grouping key) and `albumYear` alongside the existing `albumName`.
   - `src/js/player.js`: `groupSongsByAlbum()` builds the module-level `albumGroups` model (order = SONGS insertion order = scanner's newest-album-first); `buildSongList()` renders the tab strip once; `showAlbum(albumKey)` swaps the chips + marks the active tab; `albumKeyForSong(songKey)` maps the other direction. `selectSong` calls `showAlbum` first so a `?song=` deep link opens on the correct album.

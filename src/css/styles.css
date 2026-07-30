@@ -740,6 +740,9 @@ main {
   border-radius: 3px;
   overflow: hidden;
   display: none;
+  /* Defer rasterizing waveforms that are scrolled out of view. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 32px;
 }
 
 .album-track-row.is-playing .music-progress-bar,
@@ -758,29 +761,45 @@ main {
   z-index: 1;
 }
 
-/* --- Prerendered waveform image (music page) ---
-   Generated at ingestion by scripts/generate-waveforms.js and loaded as a plain
-   <img>. The SVG uses preserveAspectRatio="none", so it stretches to the bar at
-   any size — no JS, no canvas, no redraw on resize.
+/* --- Prerendered waveform (music page) ---
+   Generated at ingestion by scripts/generate-waveforms.js and served from R2.
 
-   Playback progress is shown by the .music-progress-fill overlay on top; the
-   waveform itself is a static image. */
+   The SVG is monochrome and used as a CSS mask rather than an <img>, so the color
+   comes from background-color. That's what lets the stems player tint each track
+   by category — an <img> can't be recolored by CSS.
+
+   preserveAspectRatio="none" in the SVG means it stretches to any size with no JS
+   and no repaint on resize. It rasterizes once; playback progress is a separate
+   overlay, so the waveform itself never redraws. */
 .music-waveform {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  opacity: 0.55;
   pointer-events: none;
+  /* Unplayed portion */
+  background-color: rgba(78, 168, 181, 0.4);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
-/* With a waveform present, show progress as a translucent wash over the played
-   portion rather than the 2px bottom line. */
+/* Played portion: the same mask, clipped left-to-right by a CSS variable the JS
+   updates. clip-path avoids a second element and keeps the mask aligned. */
+.music-waveform-played {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: var(--color-accent);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  clip-path: inset(0 calc(100% - var(--played, 0%)) 0 0);
+}
+
+/* The 2px fill bar is redundant once a real waveform is showing. */
 .music-waveform ~ .music-progress-fill {
-  top: 0;
-  height: 100%;
-  background-color: rgba(78, 168, 181, 0.22);
+  display: none;
 }
 
 /* --- Song Picker --- */
@@ -945,9 +964,16 @@ main {
   }
 }
 
-/* --- Waveform unloaded state — blur fake waveforms, keep labels/controls sharp --- */
+/* --- Waveform unloaded state — dim waveforms, keep labels/controls sharp ---
+   Canvas placeholders get blurred since they're fake data. Prerendered waveforms
+   are real, so they're only dimmed to signal "audio not loaded yet". */
 .waveforms-unloaded canvas {
   filter: blur(3px);
+  opacity: 0.5;
+}
+
+.waveforms-unloaded .stem-waveform,
+.waveforms-unloaded .stem-waveform-played {
   opacity: 0.5;
 }
 
@@ -1174,6 +1200,38 @@ main {
   border-radius: 3px;
   overflow: hidden;
   position: relative;
+  /* Skip rendering work for off-screen tracks. Songs can have 50+ stems, and
+     rasterizing every waveform on load costs ~1.5ms each; this defers the ones
+     you can't see. contain-intrinsic-size reserves the row's height so the
+     scrollbar doesn't jump as they come into view.
+
+     `loading="lazy"` isn't an option here: these are CSS masks on divs, not
+     <img> elements (a mask is what allows per-category tinting). */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 32px;
+}
+
+/* --- Prerendered stem waveforms (multitrack player) ---
+   One monochrome SVG per stem, served from R2 and used as a CSS mask so each
+   track can be tinted by its category color (set inline from getCategoryColor).
+   An <img> couldn't be recolored this way.
+
+   These replace the per-stem <canvas>, which had to be redrawn every animation
+   frame to advance the playhead — the player's dominant cost at high stem counts.
+   Progress here is a clip-path driven by the --played custom property. */
+.stem-waveform,
+.stem-waveform-played {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.stem-waveform-played {
+  clip-path: inset(0 calc(100% - var(--played, 0%)) 0 0);
 }
 
 .track-waveform .track-label {
