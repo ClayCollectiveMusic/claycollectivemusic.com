@@ -39,6 +39,24 @@ function stemDisplayName(fileName: string, trackName: string): string {
     return base;
 }
 
+/**
+ * Stems that are production scaffolding rather than music, and shouldn't appear
+ * in the player. The click track is a metronome — it carries no musical content
+ * and just adds a row (and a download) nobody wants.
+ *
+ * Matched against the derived display name ("Click"), not the raw filename, so
+ * it works across both naming conventions. Anchored to the whole name so a real
+ * stem like "Clicky Percussion" isn't caught.
+ *
+ * The files stay on disk and on R2 — this only hides them from album.json, so
+ * nothing is destroyed by excluding something here.
+ */
+const EXCLUDED_STEM_NAMES = [/^click(\s*(track|\d+))?$/i];
+
+function isExcludedStem(displayName: string): boolean {
+    return EXCLUDED_STEM_NAMES.some(re => re.test(displayName.trim()));
+}
+
 // Find all album directories
 const albumDirs = fs.readdirSync(mediaDir, { withFileTypes: true })
     .filter(d => d.isDirectory() && /^.+?\s*\(\d{4}\)$/.test(d.name));
@@ -160,7 +178,7 @@ for (const dir of albumDirs) {
                 folder: stemFolder,
                 fileSize,
             };
-        });
+        }).filter(stem => !isExcludedStem(stem.name));
 
         const existing = JSON.stringify(track.stems ?? []);
         const incoming = JSON.stringify(stemNames);

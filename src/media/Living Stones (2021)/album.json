@@ -23,12 +23,6 @@
           "fileSize": 12554171
         },
         {
-          "name": "Click",
-          "file": "We Are Yours - Click.mp3",
-          "folder": "01 - We Are Yours",
-          "fileSize": 12554171
-        },
-        {
           "name": "Drums",
           "file": "We Are Yours - Drums.mp3",
           "folder": "01 - We Are Yours",
@@ -96,12 +90,6 @@
         {
           "name": "Bass",
           "file": "Forever and Always - Bass.mp3",
-          "folder": "02 - Forever and Always",
-          "fileSize": 13291451
-        },
-        {
-          "name": "Click",
-          "file": "Forever and Always - Click.mp3",
           "folder": "02 - Forever and Always",
           "fileSize": 13291451
         },
@@ -177,12 +165,6 @@
           "fileSize": 10411451
         },
         {
-          "name": "Click",
-          "file": "Freedom - Click.mp3",
-          "folder": "03 - Freedom",
-          "fileSize": 10411451
-        },
-        {
           "name": "Drums",
           "file": "Freedom - Drums.mp3",
           "folder": "03 - Freedom",
@@ -232,12 +214,6 @@
         {
           "name": "Bass",
           "file": "Who is this Man - Bass.mp3",
-          "folder": "04 - Who is this Man",
-          "fileSize": 12211451
-        },
-        {
-          "name": "Click",
-          "file": "Who is this Man - Click.mp3",
           "folder": "04 - Who is this Man",
           "fileSize": 12211451
         },
@@ -313,12 +289,6 @@
           "fileSize": 10382651
         },
         {
-          "name": "Click",
-          "file": "Worthy Lord - Click.mp3",
-          "folder": "05 - Worthy Lord",
-          "fileSize": 10382651
-        },
-        {
           "name": "Drums",
           "file": "Worthy Lord - Drums.mp3",
           "folder": "05 - Worthy Lord",
@@ -384,12 +354,6 @@
           "fileSize": 12268089
         },
         {
-          "name": "Click",
-          "file": "Kindness - Click.mp3",
-          "folder": "06 - Kindness",
-          "fileSize": 12268089
-        },
-        {
           "name": "Drums",
           "file": "Kindness - Drums.mp3",
           "folder": "06 - Kindness",
@@ -451,12 +415,6 @@
         {
           "name": "Ahhs",
           "file": "I Will Rise - Ahhs.mp3",
-          "folder": "07 - I Will Rise",
-          "fileSize": 10947131
-        },
-        {
-          "name": "Click",
-          "file": "I Will Rise - Click.mp3",
           "folder": "07 - I Will Rise",
           "fileSize": 10947131
         },
