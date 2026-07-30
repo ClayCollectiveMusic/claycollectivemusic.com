@@ -161,6 +161,7 @@ export function generatePlayerData(albums) {
       songs.push({
         slug: album.slug + '--' + track.slug,
         title,
+        trackNum: track.num,
         albumName: album.name,
         albumSlug: album.slug,
         albumYear: album.year || '',

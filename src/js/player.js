@@ -15,7 +15,10 @@ var SONGS = {};
   if (song.stems && song.stems.length > 0) {
     SONGS[song.slug] = {
       title: song.title,
+      trackNum: song.trackNum || 0,
       albumName: song.albumName || '',
+      albumSlug: song.albumSlug || '',
+      albumYear: song.albumYear || '',
       artUrl: song.artUrl || '',
       zipUrl: song.zipUrl || '',
       spotifyUrl: song.spotifyUrl || '',
@@ -35,11 +38,29 @@ function formatBytes(bytes) {
 var SPOTIFY_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>';
 
 // --- Instrument Categories ---
+// Matched case-insensitively as substrings against the stem name. Each list covers both
+// the full names from the STEM-RENAME-PLAN convention ("Background Vocals 1", "Electric
+// Guitar 2") and the older DAW abbreviations ("BGV", "E GTR"), so both old and renamed
+// files categorize correctly.
+//
+// ORDER MATTERS: categorize() returns the FIRST category with a substring match, so
+// specific patterns must precede generic ones. `bass` sits above guitars/keys because
+// "Bass Guitar" contains GUITAR and "Synth Bass" contains SYNTH — either would win
+// otherwise and drag the basses into the wrong group.
 var CATEGORIES = [
-  { key: 'vocals',  label: 'Vocals',       match: ['VOC', 'VOX', 'LEAD VOC', 'BGV', 'AD LIB', 'OHHS', 'GANG', 'DBLS'], color: [78, 168, 181] },   // teal (original)
-  { key: 'guitars', label: 'Guitars',       match: ['GTR', 'GUITAR'],                                                     color: [120, 180, 100] }, // muted green
+  // Full: Lead Vocal, Background Vocals N, Vocal Doubles, Vocal FX, Vocals, Ad Libs,
+  //       Gang Vocals, Gang Vocals FX, Ohhs, Ahhs
+  { key: 'vocals',  label: 'Vocals',        match: ['VOCAL', 'VOC', 'VOX', 'BACKGROUND VOCALS', 'BGV', 'AD LIB', 'OHHS', 'AHHS', 'GANG', 'DBLS', 'DOUBLES'], color: [78, 168, 181] },   // teal (original)
+  // Full: Bass, Bass Guitar, Synth Bass
+  { key: 'bass',    label: 'Bass',          match: ['BASS'],                                                              color: [200, 110, 120] }, // dusty red
+  // Full: Acoustic Guitar, Electric Guitar N
+  { key: 'guitars', label: 'Guitars',       match: ['GUITAR', 'GTR'],                                                     color: [120, 180, 100] }, // muted green
+  // Full: Piano N, Pad N, Synth N, Keys
   { key: 'keys',    label: 'Keys & Synths', match: ['PIANO', 'KEYS', 'PAD', 'SYNTH', 'ORGAN', 'RHODES', 'WURLI'],         color: [140, 130, 190] }, // soft purple
-  { key: 'rhythm',  label: 'Rhythm',        match: ['DRUM', 'PERC', 'BASS', 'CLICK'],                                     color: [190, 140, 90] },  // warm amber
+  // Full: Drums, Percussion, Click
+  { key: 'rhythm',  label: 'Percussion',    match: ['DRUM', 'PERCUSSION', 'PERC', 'CLICK'],                               color: [190, 140, 90] },  // warm amber
+  // Full: Strings, Dulcimer
+  { key: 'strings', label: 'Strings',       match: ['STRINGS', 'DULCIMER', 'DULCI'],                                      color: [210, 175, 95] },  // soft gold
   { key: 'other',   label: 'Other',         match: [],                                                                     color: [150, 155, 160] }  // neutral grey
 ];
 
@@ -216,7 +237,10 @@ function init() {
 }
 
 function selectSong(key) {
-  // Update active state in song list
+  // Make sure the song's album is the one on display, then mark the chip active.
+  var albumKey = albumKeyForSong(key);
+  if (albumKey) showAlbum(albumKey);
+
   var items = songListEl.querySelectorAll('[data-song]');
   items.forEach(function (el) {
     el.classList.toggle('active', el.getAttribute('data-song') === key);
@@ -305,59 +329,107 @@ function selectSong(key) {
   };
 }
 
-function buildSongList() {
-  var keys = Object.keys(SONGS);
+// Album groups, built once from SONGS. Order follows SONGS insertion order,
+// which the build-time media scanner already sorts newest-album-first.
+var albumGroups = [];
+var currentAlbumKey = null;
 
-  if (keys.length === 0) {
+function groupSongsByAlbum() {
+  var byAlbum = {};
+  albumGroups = [];
+
+  Object.keys(SONGS).forEach(function (key) {
+    var song = SONGS[key];
+    var albumKey = song.albumSlug || song.albumName || '_';
+    if (!byAlbum[albumKey]) {
+      byAlbum[albumKey] = {
+        key: albumKey,
+        name: song.albumName || 'Songs',
+        year: song.albumYear || '',
+        artUrl: song.artUrl || '',
+        songKeys: []
+      };
+      albumGroups.push(byAlbum[albumKey]);
+    }
+    byAlbum[albumKey].songKeys.push(key);
+  });
+}
+
+function albumKeyForSong(songKey) {
+  for (var i = 0; i < albumGroups.length; i++) {
+    if (albumGroups[i].songKeys.indexOf(songKey) !== -1) return albumGroups[i].key;
+  }
+  return null;
+}
+
+function buildSongList() {
+  groupSongsByAlbum();
+
+  if (albumGroups.length === 0) {
     songListEl.innerHTML = '<p class="text-muted">No songs with stems available yet.</p>';
     return;
   }
 
-  // Group songs by album, preserving the order they arrive in (albums are
-  // already sorted newest-first by the build-time media scanner).
-  var groups = [];
-  var byAlbum = {};
-  keys.forEach(function (key) {
-    var song = SONGS[key];
-    var albumKey = song.albumSlug || song.albumName || '_';
-    if (!byAlbum[albumKey]) {
-      byAlbum[albumKey] = { song: song, keys: [] };
-      groups.push(byAlbum[albumKey]);
-    }
-    byAlbum[albumKey].keys.push(key);
-  });
-
-  groups.forEach(function (group) {
-    var album = group.song;
-    var row = document.createElement('div');
-    row.className = 'album-row';
-
+  var tabs = albumGroups.map(function (album) {
     var art = album.artUrl
-      ? '<img class="album-row-art" src="' + album.artUrl + '" alt="">'
-      : '<div class="album-row-art album-row-art-placeholder"></div>';
+      ? '<img class="album-tab-art" src="' + album.artUrl + '" alt="">'
+      : '<div class="album-tab-art album-tab-art-placeholder"></div>';
+    return '<button type="button" class="album-tab" data-album="' + album.key + '">' +
+      art +
+      '<span class="album-tab-info">' +
+        '<span class="album-tab-name">' + album.name + '</span>' +
+        '<span class="album-tab-meta">' +
+          (album.year ? album.year + ' \u00b7 ' : '') +
+          album.songKeys.length + (album.songKeys.length === 1 ? ' song' : ' songs') +
+        '</span>' +
+      '</span>' +
+    '</button>';
+  }).join('');
 
-    var songBtns = group.keys.map(function (key) {
-      var song = SONGS[key];
-      return '<button type="button" class="song-chip" data-song="' + key + '">' +
-        song.title.split(' \u2014 ')[0] +
-        '</button>';
-    }).join('');
+  songListEl.innerHTML =
+    '<div class="picker-group">' +
+      '<span class="picker-label">Album</span>' +
+      '<div class="album-tabs" id="album-tabs">' + tabs + '</div>' +
+    '</div>' +
+    '<div class="picker-group">' +
+      '<span class="picker-label">Tracks</span>' +
+      '<div class="album-songs" id="album-songs"></div>' +
+    '</div>';
 
-    row.innerHTML =
-      '<div class="album-row-header">' +
-        art +
-        '<div class="album-row-info">' +
-          '<span class="album-row-name">' + (album.albumName || 'Songs') + '</span>' +
-          '<span class="album-row-meta">' +
-            (album.albumYear ? album.albumYear + ' \u00b7 ' : '') +
-            group.keys.length + (group.keys.length === 1 ? ' song' : ' songs') +
-          '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="album-row-songs">' + songBtns + '</div>';
-
-    songListEl.appendChild(row);
+  songListEl.querySelector('#album-tabs').addEventListener('click', function (e) {
+    var tab = e.target.closest('[data-album]');
+    if (!tab) return;
+    // Picking an album jumps to its first song so the player always matches the tab.
+    var album = findAlbum(tab.getAttribute('data-album'));
+    if (album) selectSong(album.songKeys[0]);
   });
+}
+
+function findAlbum(albumKey) {
+  return albumGroups.find(function (a) { return a.key === albumKey; }) || null;
+}
+
+// Renders the song chips for one album, and marks that album's tab active.
+function showAlbum(albumKey) {
+  if (albumKey === currentAlbumKey) return;
+  var album = findAlbum(albumKey);
+  if (!album) return;
+  currentAlbumKey = albumKey;
+
+  songListEl.querySelectorAll('[data-album]').forEach(function (el) {
+    el.classList.toggle('active', el.getAttribute('data-album') === albumKey);
+  });
+
+  var songsEl = songListEl.querySelector('#album-songs');
+  songsEl.innerHTML = album.songKeys.map(function (key) {
+    var song = SONGS[key];
+    var num = song.trackNum
+      ? '<span class="song-chip-num">' + String(song.trackNum).padStart(2, '0') + '</span>'
+      : '';
+    return '<button type="button" class="song-chip" data-song="' + key + '">' +
+      num + song.title.split(' \u2014 ')[0] +
+      '</button>';
+  }).join('');
 }
 
 // --- Waveform Rendering ---

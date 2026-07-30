@@ -758,71 +758,140 @@ main {
   z-index: 1;
 }
 
+/* --- Prerendered waveform image (music page) ---
+   Generated at ingestion by scripts/generate-waveforms.js and loaded as a plain
+   <img>. The SVG uses preserveAspectRatio="none", so it stretches to the bar at
+   any size — no JS, no canvas, no redraw on resize.
+
+   Playback progress is shown by the .music-progress-fill overlay on top; the
+   waveform itself is a static image. */
+.music-waveform {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* With a waveform present, show progress as a translucent wash over the played
+   portion rather than the 2px bottom line. */
+.music-waveform ~ .music-progress-fill {
+  top: 0;
+  height: 100%;
+  background-color: rgba(78, 168, 181, 0.22);
+}
+
 /* --- Song Picker --- */
-/* --- Song picker, grouped by album --- */
+/* Two levels: album tabs on top, songs of the selected album below. */
 .song-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
-.album-row {
+/* Each picker level gets a small caps label, matching the .song-table th treatment. */
+.picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.picker-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.album-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.album-tab {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  padding: 10px 16px 10px 10px;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  color: var(--color-text);
+  font-family: inherit;
+  text-align: left;
 }
 
-.album-row-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 200px;
-  flex-shrink: 0;
+.album-tab:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-surface-hover);
 }
 
-.album-row-art {
-  width: 48px;
-  height: 48px;
+.album-tab.active {
+  border-color: var(--color-accent);
+  background-color: rgba(78, 168, 181, 0.12);
+}
+
+.album-tab-art {
+  width: 40px;
+  height: 40px;
   border-radius: 4px;
   object-fit: cover;
   flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
 }
 
-.album-row-art-placeholder {
+.album-tab:hover .album-tab-art,
+.album-tab.active .album-tab-art {
+  opacity: 1;
+}
+
+.album-tab-art-placeholder {
   background-color: var(--color-bg);
 }
 
-.album-row-info {
+.album-tab-info {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.album-row-name {
-  font-size: 0.95rem;
+.album-tab-name {
+  font-size: 0.9rem;
   font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color 0.2s ease;
+}
+
+.album-tab:hover .album-tab-name,
+.album-tab.active .album-tab-name {
   color: var(--color-white);
 }
 
-.album-row-meta {
-  font-size: 0.75rem;
+.album-tab-meta {
+  font-size: 0.72rem;
   color: var(--color-text-muted);
 }
 
-.album-row-songs {
+/* Songs of the selected album */
+.album-songs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  flex: 1;
 }
 
 .song-chip {
+  display: inline-flex;
+  align-items: baseline;
   padding: 8px 16px;
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -833,6 +902,19 @@ main {
   font-family: inherit;
   font-size: 0.9rem;
   white-space: nowrap;
+}
+
+/* Track number sits inside the chip, dimmed so the title stays dominant. */
+.song-chip-num {
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  margin-right: 8px;
+  transition: color 0.2s ease;
+}
+
+.song-chip:hover .song-chip-num,
+.song-chip.active .song-chip-num {
+  color: var(--color-accent);
 }
 
 .song-chip:hover {
@@ -848,14 +930,18 @@ main {
   font-weight: 600;
 }
 
+/* On mobile the album tabs scroll sideways in one row instead of stacking into
+   a tall block that pushes the player off-screen. */
 @media (max-width: 768px) {
-  .album-row {
-    gap: 12px;
+  .album-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .album-row-header {
-    min-width: 0;
-    width: 100%;
+  .album-tab {
+    flex-shrink: 0;
   }
 }
 
