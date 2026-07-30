@@ -40,6 +40,19 @@ function stemDisplayName(fileName: string, trackName: string): string {
 }
 
 /**
+ * Stem fields that are typed in by hand and must survive a regeneration.
+ *
+ * The stems array is rebuilt from disk on every run, so a field that isn't
+ * listed here is destroyed the next time `media:process` runs. Add to this list
+ * whenever a new hand-authored stem field is introduced.
+ *
+ * `downloadUrl` is a link to the full-quality file (the .wav master, hosted
+ * off-site since wavs are too large for R2). It's optional per stem — when
+ * empty, scan-media.js falls back to offering the mp3 for download.
+ */
+const PRESERVED_STEM_FIELDS = ['downloadUrl'] as const;
+
+/**
  * Stems that are production scaffolding rather than music, and shouldn't appear
  * in the player. The click track is a metronome — it carries no musical content
  * and just adds a row (and a download) nobody wants.
@@ -169,6 +182,21 @@ for (const dir of albumDirs) {
             cwd: path.join(stemsBaseDir, stemFolder)
         }).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
+        // Hand-authored fields on the EXISTING entries, keyed by filename. The
+        // stems array is rebuilt wholesale from disk below, so anything typed in
+        // by hand has to be carried across or it's silently destroyed on the next
+        // run. `file` is the key because it's the one field derived directly from
+        // disk and therefore stable across regenerations.
+        const preserved = new Map<string, Record<string, unknown>>();
+        for (const stem of (track.stems ?? []) as Array<Record<string, unknown>>) {
+            if (typeof stem?.file !== 'string') continue;
+            const keep: Record<string, unknown> = {};
+            for (const field of PRESERVED_STEM_FIELDS) {
+                if (stem[field] !== undefined) keep[field] = stem[field];
+            }
+            if (Object.keys(keep).length > 0) preserved.set(stem.file, keep);
+        }
+
         const stemNames = stemFiles.map(sf => {
             const fullPath = path.join(stemsBaseDir, stemFolder, sf);
             const fileSize = fs.statSync(fullPath).size;
@@ -177,6 +205,10 @@ for (const dir of albumDirs) {
                 file: sf,
                 folder: stemFolder,
                 fileSize,
+                downloadUrl: '',
+                // Re-apply hand-authored values last so they win over the
+                // defaults above.
+                ...preserved.get(sf),
             };
         }).filter(stem => !isExcludedStem(stem.name));
 

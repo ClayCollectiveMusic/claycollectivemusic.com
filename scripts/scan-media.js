@@ -139,6 +139,12 @@ export function scanMedia(mediaDir) {
             ? mediaUrl(dirName, 'stems', folder, stemSvg)
             : null,
           fileSize: stem.fileSize || 0,
+          // Optional hand-authored link to the full-quality file (the .wav
+          // master, hosted off-site — wavs are too large for R2). Hand-edited in
+          // album.json and carried across regenerations by process-media.ts
+          // (PRESERVED_STEM_FIELDS). Null when unset, and the mp3 is offered
+          // for download instead.
+          downloadUrl: stem.downloadUrl || null,
         };
       });
 
@@ -212,10 +218,17 @@ export function generatePlayerData(albums) {
         zipUrl: track.stemsLink || '',
         stemsUrl: track.stemsLink || '',
         spotifyUrl: track.spotifyUrl || '',
+        // Two URLs per stem, split by purpose rather than by format:
+        //   streamUrl   — what the player fetches and decodes. Always the R2
+        //                 mp3; an off-site share link can't be fed to the Web
+        //                 Audio API.
+        //   downloadUrl — what a "download" link points at. The hand-authored
+        //                 full-quality file when one is set, otherwise the same
+        //                 mp3, so every stem stays downloadable either way.
         stems: track.stems.map(s => ({
           name: s.name,
-          url: s.url,
-          downloadUrl: s.url,
+          streamUrl: s.url,
+          downloadUrl: s.downloadUrl || s.url,
           waveformUrl: s.waveformUrl || '',
           fileSize: s.fileSize || 0,
         })),

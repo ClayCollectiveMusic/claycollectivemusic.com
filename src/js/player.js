@@ -134,10 +134,12 @@ function init() {
 
   playBtn.addEventListener('click', togglePlay);
 
+  initStemDownloadMenus();
+
   // Drag-to-seek: mousedown starts, mousemove continues, mouseup ends
   var isDragging = false;
   waveformArea.addEventListener('mousedown', function (e) {
-    if (e.target.closest('.track-controls') || e.target.closest('.group-controls') || e.target.closest('.track-download-btn')) return;
+    if (e.target.closest('.track-controls') || e.target.closest('.group-controls') || e.target.closest('.track-download-btn') || e.target.closest('.track-menu-list')) return;
     isDragging = true;
     seekToEvent(e);
   });
@@ -283,7 +285,12 @@ function selectSong(key) {
     tracks.push({
       name: stem.name,
       category: categorize(stem.name),
-      downloadUrl: stem.downloadUrl || stem.url,
+      // Kept separate rather than collapsed into one url: the download menu
+      // offers both formats, so it needs to know whether a .wav actually exists.
+      mp3Url: stem.streamUrl,
+      wavUrl: stem.downloadUrl && stem.downloadUrl !== stem.streamUrl
+        ? stem.downloadUrl
+        : null,
       buffer: null,
       source: null,
       gainNode: gainNode,
@@ -654,7 +661,7 @@ async function onSongChange(songKey, autoPlay) {
   var failedCount = 0;
   await Promise.allSettled(
     song.stems.map(function (stem, i) {
-      return fetch(stem.url, { signal: signal })
+      return fetch(stem.streamUrl, { signal: signal })
         .then(function (r) {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           var contentLength = r.headers.get('Content-Length');
@@ -939,6 +946,161 @@ function formatTime(sec) {
   return m + ':' + (s < 10 ? '0' : '') + s;
 }
 
+var MENU_VIEWPORT_MARGIN = 8;
+
+/**
+ * Left-aligns an open menu with its button, shifting it left when it would
+ * overflow the viewport. Mirrors positionTrackMenu() in music-player.js — that
+ * file isn't loaded on this page, so the logic can't simply be shared.
+ */
+function positionStemMenu(wrap) {
+  var list = wrap.querySelector('.track-menu-list');
+  if (!list) return;
+
+  list.style.left = '0px';
+
+  var wrapLeft = wrap.getBoundingClientRect().left;
+  var width = list.offsetWidth;
+  var maxLeft = window.innerWidth - MENU_VIEWPORT_MARGIN - width;
+  var targetLeft = Math.max(MENU_VIEWPORT_MARGIN, Math.min(wrapLeft, maxLeft));
+
+  list.style.left = (targetLeft - wrapLeft) + 'px';
+}
+
+function closeStemMenus(except) {
+  document.querySelectorAll('.stem-download-menu.is-open').forEach(function (el) {
+    if (el === except) return;
+    el.classList.remove('is-open');
+    var btn = el.querySelector('.track-menu-btn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+/**
+ * Wires the per-stem download dropdowns: one delegated click handler, plus
+ * Escape and outside-click to dismiss. Delegated because track rows are rebuilt
+ * on every song change — per-button listeners would be re-attached each time.
+ */
+function initStemDownloadMenus() {
+  document.addEventListener('click', function (e) {
+    var menuBtn = e.target.closest('.stem-download-menu .track-menu-btn');
+    if (menuBtn) {
+      e.preventDefault();
+      var wrap = menuBtn.closest('.stem-download-menu');
+      var willOpen = !wrap.classList.contains('is-open');
+      closeStemMenus(wrap);
+      wrap.classList.toggle('is-open', willOpen);
+      menuBtn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      if (willOpen) positionStemMenu(wrap);
+      return;
+    }
+    // A click on a menu item should follow the link, then dismiss.
+    closeStemMenus(null);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeStemMenus(null);
+  });
+
+  window.addEventListener('resize', function () {
+    var open = document.querySelector('.stem-download-menu.is-open');
+    if (open) positionStemMenu(open);
+  });
+  // Capture phase: the track list scrolls independently of the page, so a
+  // non-capturing listener would miss its scroll events entirely.
+  window.addEventListener('scroll', function () {
+    var open = document.querySelector('.stem-download-menu.is-open');
+    if (open) positionStemMenu(open);
+  }, true);
+}
+
+/**
+ * Builds the per-stem download control.
+ *
+ * With only an mp3 there's nothing to choose, so it stays a single button and
+ * downloads directly — a one-item menu is pure friction. When the stem also has
+ * a .wav it becomes a dropdown offering both.
+ */
+function buildStemDownloadMenu(track) {
+  var glyph =
+    '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">' +
+      '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>' +
+    '</svg>';
+
+  if (!track.wavUrl) {
+    var single = document.createElement('a');
+    single.className = 'track-download-btn';
+    applyDownloadHref(single, track.mp3Url, 'Download stem');
+    single.innerHTML = glyph;
+    return single;
+  }
+
+  var menu = document.createElement('div');
+  menu.className = 'track-menu stem-download-menu';
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'track-download-btn track-menu-btn';
+  btn.setAttribute('title', 'Download stem');
+  btn.setAttribute('aria-label', 'Download ' + track.name);
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.innerHTML = glyph;
+
+  var list = document.createElement('div');
+  list.className = 'track-menu-list';
+  list.setAttribute('role', 'menu');
+
+  var mp3 = document.createElement('a');
+  mp3.setAttribute('role', 'menuitem');
+  applyDownloadHref(mp3, track.mp3Url, '');
+  mp3.innerHTML = '<span class="file-tag">.mp3</span>Download mp3';
+
+  var wav = document.createElement('a');
+  wav.setAttribute('role', 'menuitem');
+  applyDownloadHref(wav, track.wavUrl, '');
+  wav.innerHTML = '<span class="file-tag">.wav</span>Download wav';
+
+  list.appendChild(mp3);
+  list.appendChild(wav);
+  menu.appendChild(btn);
+  menu.appendChild(list);
+  return menu;
+}
+
+/**
+ * Points an <a> at a URL with the right download behavior.
+ *
+ * The `download` attribute is IGNORED cross-origin, so an off-site link (a .wav
+ * master on Drive) would navigate the current tab to a viewer page and destroy
+ * the loaded player. Those open in a new tab instead; same-origin R2 files keep
+ * true download behavior.
+ */
+function applyDownloadHref(el, url, title) {
+  el.href = url;
+  if (isSameOrigin(url)) {
+    el.setAttribute('download', '');
+    if (title) el.setAttribute('title', title);
+  } else {
+    el.setAttribute('target', '_blank');
+    el.setAttribute('rel', 'noopener');
+    if (title) el.setAttribute('title', title + ' (opens in a new tab)');
+  }
+}
+
+/**
+ * True when `url` is on this page's origin. Used to decide whether an <a
+ * download> will actually download (same-origin) or be ignored by the browser
+ * (cross-origin). Relative URLs resolve against the page, so they're same-origin.
+ */
+function isSameOrigin(url) {
+  try {
+    return new URL(url, window.location.href).origin === window.location.origin;
+  } catch (e) {
+    return false;
+  }
+}
+
 // --- Track Controls ---
 function renderTracks() {
   trackListEl.innerHTML = '';
@@ -1045,16 +1207,9 @@ function renderTracks() {
         track.loadingBar = loadBar;
       }
 
-      // Download button — on the RIGHT
-      var dlBtn = document.createElement('a');
-      dlBtn.className = 'track-download-btn';
-      dlBtn.href = track.downloadUrl;
-      dlBtn.setAttribute('download', '');
-      dlBtn.setAttribute('title', 'Download stem');
-      dlBtn.innerHTML =
-        '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">' +
-          '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>' +
-        '</svg>';
+      // Download menu — on the RIGHT. Reuses the .track-menu pattern from the
+      // music page so both pages' download menus look and behave the same.
+      var dlBtn = buildStemDownloadMenu(track);
 
       row.appendChild(controls);
       row.appendChild(canvasWrap);

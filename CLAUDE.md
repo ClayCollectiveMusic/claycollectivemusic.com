@@ -156,6 +156,24 @@ directly: `node scripts/generate-waveforms.js --force`.
 - `gh-pages` — deployed site (GitHub Pages, legacy)
 
 ## Recent Changes
+- **Per-stem `downloadUrl` in album.json.** `.wav` masters are too large for R2, so they're
+  hosted off-site (Google Drive) and linked per stem.
+  - Stem URLs are named by purpose, not format: `streamUrl` = always the R2 mp3 (an
+    off-site share link can't be fetched into the Web Audio API); `downloadUrl` = the
+    hand-authored link when set, else the same mp3, so every stem stays downloadable.
+  - Renamed `stem.url` → `stem.streamUrl` in `generatePlayerData` + both `player.js` uses.
+  - `process-media.ts` rebuilds `stems` wholesale from disk, so hand-typed fields must be
+    carried across. `PRESERVED_STEM_FIELDS` does that, keyed on `file` (stable across
+    regenerations). **Add new hand-authored stem fields to that list or they vanish.**
+  - **Per-stem download is a dropdown** when a `.wav` link exists (`.mp3` / `.wav`), and
+    stays a plain one-click button when it doesn't — a one-item menu is pure friction.
+    Built by `buildStemDownloadMenu()` in `player.js`, reusing the `.track-menu` CSS from
+    the music page.
+  - **`<a download>` is ignored cross-origin.** An off-site .wav would otherwise navigate
+    the current tab to a Drive viewer and destroy the loaded player, so `applyDownloadHref()`
+    sends those to a new tab and keeps true download behavior for same-origin R2 files.
+  - Menu open/close is duplicated in `player.js` (`initStemDownloadMenus`) rather than
+    shared — `music-player.js` isn't loaded on the player page.
 - **Waveforms renamed `<name>.svg` → `<name>.peaks.svg`.** 159 files renamed locally,
   uploaded, and the 159 old R2 objects pruned. The suffix lives in one place
   (`WAVEFORM_SUFFIX`, exported from `generate-waveforms.js`, imported by `scan-media.js`)

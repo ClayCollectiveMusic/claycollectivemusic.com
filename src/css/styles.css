@@ -1392,6 +1392,26 @@ main {
   color: var(--color-white);
 }
 
+/* Per-stem download dropdown (player page). Reuses .track-menu from the music
+   page for the popup itself; these rules just let the 26px icon button act as
+   the trigger. Without the explicit background/border reset the <button> picks
+   up the UA default and shows a grey box behind the glyph. */
+.stem-download-menu {
+  flex-shrink: 0;
+}
+
+.stem-download-menu .track-download-btn {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* The dropdown is absolutely positioned inside the row, which clips it in the
+   scrolling track list unless the open row is lifted above its siblings. */
+.stem-download-menu.is-open {
+  z-index: 21;
+}
+
 /* --- Footer --- */
 .site-footer {
   background-color: var(--color-bg-alt);
