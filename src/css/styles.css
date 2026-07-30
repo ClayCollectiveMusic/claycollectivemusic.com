@@ -157,14 +157,6 @@ main {
   border-bottom-color: var(--color-accent);
 }
 
-.nav-links a.nav-external {
-  color: var(--color-accent);
-}
-
-.nav-links a.nav-external:hover {
-  color: var(--color-accent-hover);
-}
-
 /* Mobile nav toggle */
 .nav-toggle {
   display: none;
