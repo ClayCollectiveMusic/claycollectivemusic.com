@@ -1,7 +1,7 @@
 # Clay Collective Music — Project Guide
 
 ## What This Is
-A static website for Clay Collective, a worship music collective. The site showcases their music catalog, provides MP3 downloads, chord charts, and an interactive multitrack stem player.
+A static website for Clay Collective, a worship music collective based in Central PA. The site showcases their music catalog, provides MP3 downloads, stem downloads, and an interactive multitrack stem player. **Chord charts do not exist yet** — copy may say they're "on the way" but must never promise them as available.
 
 **Live site:** https://claycollectivemusic.com
 **Beta site:** https://beta.claycollectivemusic.com (deployed via GitHub Actions on push to master)
@@ -20,7 +20,8 @@ src/                        # Vite root
   index.html                # Home page
   music.html                # Music catalog (albums + tracks)
   player.html               # Multitrack stem player page
-  people.html               # Team/people page
+  story.html                # Our Story (replaced the old people.html)
+  merch.html                # Merch landing page
   css/styles.css             # All styles (shared across pages)
   js/player.js               # Multitrack stem player (Web Audio API)
   js/music-player.js          # Inline track player for music.html (HTML5 Audio)
@@ -155,7 +156,61 @@ directly: `node scripts/generate-waveforms.js --force`.
 - `master` — main development branch
 - `gh-pages` — deployed site (GitHub Pages, legacy)
 
+## Copy & Voice
+- **Never use em dashes** in copy, comments, or commit messages. Use a comma, semicolon, or a rewrite.
+- **The region is named: Central PA.** Earlier copy said "the region" everywhere without ever
+  naming it, which read as evasive and was worthless for SEO. Don't reintroduce the vague form.
+- **Don't promise what doesn't ship.** Chord charts and WAV stem downloads were both advertised
+  prominently while being undeliverable. Stems stream as **mp3**; `.wav` appears only when a stem
+  has a hand-authored `downloadUrl` in album.json. Per-track **volume sliders were removed** — copy
+  should say "solo and mute", never "adjust volume".
+- **Voice:** plain, warm, and positive. **Not witty.** Avoid clever turns of phrase, dry asides,
+  and anything that sounds like it's pleased with itself ("the ceiling moved", "that turns out to be
+  a real constraint", "tired of waiting for someone else"). Say the thing straightforwardly.
+- **Never frame the story negatively.** Motivation is what the team wanted to build, never what
+  they were frustrated by or reacting against. Don't invent motives that aren't documented.
+- `site.json` `copyright` holds **no year** — the footer prepends the current year at render time.
+  Don't add one back. Rights statement is deliberately not Creative Commons: songs/stems are free
+  for church use, all other rights reserved.
+
 ## Recent Changes
+- **Full copy audit (all pages).** Fixed factual overclaims (WAV stems, per-track volume, chord
+  charts), named Central PA in place of "the region", rewrote the story timeline, and rewrote every
+  page's `<title>`/`description`/`og:*`.
+  - **The home page's "What We're Working On" / "Our Process" section was deleted outright.** It
+    described the writing-then-recording seasonal rhythm. Cut as something nobody cares about; don't
+    reintroduce a process/behind-the-scenes section. Removing it also made `.mission-block` and the
+    already-unused `.stat-*` rules dead, so those went too.
+    - Home section bands were re-alternated after the removal (alt / plain / alt). Two adjacent
+      `.section-alt` blocks merge into one continuous band, so check this when adding or removing a
+      home section.
+  - **The home hero blurb ("We're a collective of songwriters, singers, and musicians with one
+    driving passion…") is deliberate and stays as-is.** It was rewritten during this audit and
+    reverted on request. Don't "improve" it.
+  - Also: 
+  - Home hero tagline is now **one line with a bullet separator**, wrapping to two lines when it
+    doesn't fit. Replaces two stacked `<p>`s with a 3px gap that looked like a rendering bug.
+    - Three `<span>`s (half, `.tagline-sep` bullet, half). **The stack and the bullet's visibility
+      are driven by the same `@media (max-width: 700px)` block** — `display: block` on the halves,
+      `display: none` on the bullet. Keeping both in one query is the whole trick: CSS cannot detect
+      that text has wrapped, so if the two ever diverge the bullet strands at a line edge.
+    - Two earlier attempts failed, don't repeat them: (a) flex + `flex-wrap`, which breaks between
+      items regardless of available width; (b) relying on natural inline wrapping, which leaves the
+      bullet trailing at the end of line one. Both are unfixable by media query alone.
+    - **700px is deliberate**, not the site's usual 768px: the phrases need ~490px at this size, so
+      the switch fires with headroom before natural wrapping could occur while the bullet still
+      shows. **If either phrase gets longer, re-check that margin.**
+    - **Gotcha:** a `content: '\2022'` in single quotes inside the inline `<style>` broke Vite's
+      `html-inline-proxy` at build time. Double quotes work. Build the site after touching inline CSS.
+  - `activePage` for story.html was still `'people'` (dead leftover); now `'story'` in both
+    story.html and nav.ejs.
+  - **Removed a duplicate `id="overall-progress-wrap"` block** in player.html (also duplicated
+    `overall-progress-fill` / `-label`). Invalid HTML, and `getElementById` only ever bound the
+    first — dead leftover from when the progress bar moved into the transport bar.
+  - "Download All" → "Download All Stems (.zip)"; the load-failure message no longer says
+    "Please try again" (there's no retry affordance) and points at reloading instead.
+  - Footer "Music & Charts" → "Music & Downloads". Merch page now uses its previously-unused
+    `.merch-note` class, and the "we take no cut" line moved from the `<meta>` tag into the visible lede.
 - **Per-stem `downloadUrl` in album.json.** `.wav` masters are too large for R2, so they're
   hosted off-site (Google Drive) and linked per stem.
   - Stem URLs are named by purpose, not format: `streamUrl` = always the R2 mp3 (an

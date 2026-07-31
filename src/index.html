@@ -3,11 +3,11 @@
 <head>
   <%- include('partials/head.ejs', {
     data,
-    title: 'Clay Collective Music | Worship Music for the Region',
-    description: 'Clay Collective is a worship collective creating music for the church and the region. Explore our catalog, download chord charts, stems, and listen to our tracks.',
-    keywords: 'Clay Collective, worship music, chord charts, stems, multitrack, church music',
+    title: 'Clay Collective Music | Worship Music from Central PA',
+    description: 'Clay Collective is a worship collective from Central PA writing original songs for the local church. Stream our catalog, download MP3s and stems, and use them with your worship team at no charge.',
+    keywords: 'Clay Collective, worship music, worship stems, multitrack, church music, Central PA worship',
     ogTitle: 'Clay Collective Music',
-    ogDescription: 'A worship collective creating music for the church and the region.',
+    ogDescription: 'A worship collective from Central PA writing original songs for the local church.',
     canonical: ''
   }) %>
   <style>
@@ -27,6 +27,30 @@
       letter-spacing: 0.14em;
       color: var(--color-accent);
       margin-bottom: 24px;
+      /* One line with a bullet on desktop, two lines with no bullet on mobile.
+         CSS can't detect that text has wrapped, so the layout switch and the
+         bullet's visibility are driven by the SAME breakpoint below. They must
+         stay in sync: if the text wraps on its own while the bullet is still
+         showing, the bullet strands at a line edge. Hence nowrap halves plus an
+         explicit stack, rather than relying on natural wrapping. */
+      line-height: 1.6;
+    }
+    .hero-tagline span {
+      white-space: nowrap;
+    }
+    .hero-tagline .tagline-sep {
+      opacity: 0.6;
+    }
+    /* 700px, not the site's usual 768px: the two phrases at this size and
+       letter-spacing run out of room around 490px inside .container, so the
+       switch has to happen comfortably before natural wrapping would kick in. */
+    @media (max-width: 700px) {
+      .hero-tagline .tagline-sep {
+        display: none;
+      }
+      .hero-tagline span {
+        display: block;
+      }
     }
     .hero-home .subtitle {
       font-size: 1.25rem;
@@ -74,48 +98,6 @@
     .listen-card span {
       font-weight: 600;
       font-size: 0.95rem;
-    }
-    .mission-block {
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-    }
-    .mission-block blockquote {
-      font-family: var(--font-heading);
-      font-size: 1.6rem;
-      color: var(--color-white);
-      line-height: 1.5;
-      margin-bottom: 20px;
-      font-style: italic;
-    }
-    .mission-block p {
-      color: var(--color-text-muted);
-      font-size: 1rem;
-      line-height: 1.7;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-    .stat-row {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      flex-wrap: wrap;
-    }
-    .stat-item {
-      text-align: center;
-    }
-    .stat-item .stat-number {
-      font-family: var(--font-heading);
-      font-size: 2.5rem;
-      color: var(--color-accent);
-      font-weight: bold;
-      display: block;
-    }
-    .stat-item .stat-label {
-      color: var(--color-text-muted);
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
     }
     .recent-work-grid {
       display: grid;
@@ -170,10 +152,7 @@
       .hero-home { padding: 60px 0 48px; }
       .hero-home h1 { font-size: 2.2rem; }
       .hero-home .subtitle { font-size: 1.05rem; }
-      .mission-block blockquote { font-size: 1.3rem; }
-      .stat-item .stat-number { font-size: 2rem; }
-      .stat-row { gap: 32px; }
-}
+    }
   </style>
 </head>
 <body>
@@ -185,9 +164,12 @@
     <section class="hero-home">
       <div class="container">
         <h1>Clay Collective Music</h1>
-        <p class="hero-tagline" style="margin-bottom: 3px">Music from the Collective</p>
-        <p class="hero-tagline">Worship from the heart</p>
-        <p class="subtitle">We're a collective of songwriters, singers, and musicians with one driving passion: to encourage and equip the church to worship God. </p>
+        <!-- One line with the bullet above 700px, two lines without it below.
+             Both halves of that switch live in the media query in <style> above. -->
+        <p class="hero-tagline">
+          <span>Music from the Collective</span> <span class="tagline-sep">&bull;</span> <span>Worship from the heart</span>
+        </p>
+        <p class="subtitle">We're a collective of songwriters, singers, and musicians with one driving passion: to encourage and equip the church to worship God.</p>
         <div class="hero-ctas">
           <a href="music.html" class="btn btn-primary">Explore Our Music</a>
           <a href="story.html" class="btn btn-outline">Our Story</a>
@@ -237,13 +219,36 @@
       </div>
     </section>
 
-    <!-- What's Next -->
+    <!-- What We Offer -->
     <section class="section">
       <div class="container">
-        <div class="mission-block">
-          <h2 style="margin-bottom: 20px;">What We're Working On</h2>
-          <p>Our year moves in seasons: a season of writing, where songs get tested and refined in our local church gatherings, followed by a season of recording, where we bring the best of them into the studio. That rhythm is what keeps new music coming and keeps it rooted in how our churches actually worship.</p>
-          <div class="accent-line mt-32" style="margin-left: auto; margin-right: auto;"></div>
+        <div class="section-header">
+          <h2>Resources for Your Worship Team</h2>
+          <p>Freely available to anyone who can use them</p>
+          <div class="accent-line"></div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-body">
+              <h3>Songs &amp; Downloads</h3>
+              <p>Every song in our catalog, streaming right on the page, with MP3 downloads for your team. Chord charts are on the way.</p>
+              <a href="music.html" class="btn btn-outline btn-sm">Browse Catalog</a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3>Stems &amp; Multitrack Player</h3>
+              <p>Preview every stem in our browser player, solo and mute individual parts to hear how they fit, then download the ones your team needs. Handy for rehearsing or running tracks live.</p>
+              <a href="player.html" class="btn btn-outline btn-sm">Open Player</a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3>Merch</h3>
+              <p>T-shirts, hats, and more. We take no cut, so you pay only for printing and shipping.</p>
+              <a href="merch.html" class="btn btn-outline btn-sm">Shop Now</a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -263,40 +268,6 @@
             <span><%= l.name %></span>
           </a>
           <% }); %>
-        </div>
-      </div>
-    </section>
-
-    <!-- What We Offer -->
-    <section class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Resources for Your Worship Team</h2>
-          <p>Everything you need to play our songs. All free.</p>
-          <div class="accent-line"></div>
-        </div>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-body">
-              <h3>Songs &amp; Chord Charts</h3>
-              <p>Full-length recordings, MP3 downloads, and professionally formatted chord charts for every song. Download the PDF, hand it to your band, and you're set.</p>
-              <a href="music.html" class="btn btn-outline btn-sm">Browse Catalog</a>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <h3>Stems &amp; Multitrack Player</h3>
-              <p>Download individual WAV stems or preview them in our interactive browser player with solo, mute, and volume per track. Perfect for running tracks live or rehearsing.</p>
-              <a href="player.html" class="btn btn-outline btn-sm">Open Player</a>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-body">
-              <h3>Merch</h3>
-              <p>T-shirts, hats, and more, offered at cost through our print partner.</p>
-              <a href="merch.html" class="btn btn-outline btn-sm">Shop Now</a>
-            </div>
-          </div>
         </div>
       </div>
     </section>

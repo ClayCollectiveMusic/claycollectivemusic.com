@@ -783,7 +783,8 @@ async function onSongChange(songKey, autoPlay) {
   if (signal.aborted) return;
 
   if (failedCount > 0 && loadedCount === 0) {
-    overallProgressLabel.textContent = 'Failed to load stems. Please try again.';
+    // No retry affordance exists, so point at the one recovery that actually works.
+    overallProgressLabel.textContent = 'Couldn’t load these stems. Reload the page to try again.';
     overallProgressLabel.style.color = 'var(--color-error, #e05c5c)';
   } else if (failedCount > 0) {
     overallProgressLabel.textContent = failedCount + ' stem' + (failedCount > 1 ? 's' : '') + ' failed to load.';

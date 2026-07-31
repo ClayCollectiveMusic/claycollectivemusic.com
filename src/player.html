@@ -4,10 +4,10 @@
   <%- include('partials/head.ejs', {
     data,
     title: 'Stems & Multitrack Player | Clay Collective Music',
-    description: 'Download individual stems and use the interactive multitrack player for Clay Collective songs. Solo, mute, and mix stems right in your browser, then download the ones you need.',
+    description: 'Play every stem of a Clay Collective song right in your browser. Solo and mute individual parts to hear how they fit, then download the stems your team needs.',
     keywords: 'Clay Collective, stem downloads, multitrack player, worship stems, isolated tracks',
     ogTitle: 'Stems & Multitrack Player | Clay Collective Music',
-    ogDescription: 'Interactive multitrack player with stem downloads. Solo, mute, mix, and download individual tracks.',
+    ogDescription: 'Play every stem in your browser. Solo, mute, and download individual tracks.',
     canonical: 'player.html'
   }) %>
 </head>
@@ -19,7 +19,7 @@
     <section class="hero">
       <div class="container">
         <h1>Stems &amp; Multitrack Player</h1>
-        <p class="subtitle">Pick a song to preview each stem in the player. You can solo, mute, and adjust the mix, then download the individual stems you need for your team.</p>
+        <p class="subtitle">Pick a song to load every stem into the player. Solo or mute individual parts to hear how they fit together, then download the ones your team needs.</p>
         <div class="accent-line"></div>
       </div>
     </section>
@@ -55,7 +55,8 @@
               <div class="player-progress-label" id="overall-progress-label">Loading stems&hellip;</div>
             </div>
             <div class="download-all-wrapper" id="download-all-wrapper" style="display: none;">
-              <a href="#" class="btn btn-primary btn-sm" id="download-all-btn" target="_blank">Download All</a>
+              <a href="#" class="btn btn-primary btn-sm" id="download-all-btn" target="_blank">Download All Stems
+                (.zip)</a>
             </div>
           </div>
 
@@ -66,14 +67,6 @@
             <div class="track-list" id="track-list"></div>
           </div>
 
-        </div>
-
-        <!-- Overall loading progress -->
-        <div id="overall-progress-wrap" style="display: none;">
-          <div class="player-progress-bar">
-            <div class="player-progress-fill" id="overall-progress-fill"></div>
-          </div>
-          <div class="player-progress-label" id="overall-progress-label">Loading stems&hellip;</div>
         </div>
 
       </div>
