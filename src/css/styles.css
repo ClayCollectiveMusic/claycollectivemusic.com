@@ -105,6 +105,38 @@ main {
   height: var(--nav-height);
 }
 
+/* Transparent-until-scrolled nav, home page only (body.has-hero-photo), where
+   the hero photo sits behind it. Other pages have plain backgrounds, so a
+   see-through nav there would just look like a missing bar.
+
+   The nav goes position: fixed rather than sticky so the hero can start at the
+   very top of the viewport underneath it; sticky would still occupy layout
+   space and leave a strip of page background above the photo. .hero-home then
+   pads by --nav-height to keep its text clear of the bar.
+
+   .scrolled is toggled from the inline script in index.html. */
+body.has-hero-photo .site-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background-color: transparent;
+  border-bottom-color: transparent;
+  transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
+}
+
+body.has-hero-photo .site-nav.scrolled {
+  background-color: var(--color-bg-alt);
+  border-bottom-color: var(--color-border);
+}
+
+/* The mobile dropdown is opaque, so over a transparent bar it would hang in
+   midair with the photo showing through above it. Give the bar its solid
+   background back whenever the menu is open, at any scroll position. */
+body.has-hero-photo .site-nav:has(.nav-links.open) {
+  background-color: var(--color-bg-alt);
+  border-bottom-color: var(--color-border);
+}
+
 .site-nav .container {
   display: flex;
   align-items: center;
@@ -223,6 +255,23 @@ main {
   height: 3px;
   background-color: var(--color-accent);
   margin: 0 auto;
+}
+
+/* Home hero background photo. This rule lives here rather than in index.html's
+   inline <style> (where the rest of .hero-home is defined) because a url() in an
+   inline <style> breaks Vite's html-inline-proxy at build time. The scrim that
+   sits over it, and .hero-home itself, are still in index.html. */
+.hero-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../images/home-backdrop.png");
+  background-size: cover;
+  background-position: center 35%;
+  /* Compounds with the scrim in index.html — the two multiply, so 0.5 here plus
+     a 0.5 scrim left the photo at roughly a quarter brightness and read as flat
+     black. Adjust these together, not independently. */
+  opacity: 0.75;
 }
 
 /* --- Section --- */

@@ -11,14 +11,101 @@
     canonical: ''
   }) %>
   <style>
+    /* Full viewport height so the photo fills the screen edge to edge, which is
+       the whole point of the transparent nav above it. min-height (not height)
+       lets it grow if the content ever needs more room. svh, not vh, so mobile
+       browser chrome collapsing doesn't cause a jump.
+
+       Top padding includes --nav-height: the nav is fixed on this page (see
+       body.has-hero-photo in styles.css), so the photo runs to the top of the
+       viewport behind it while the text still clears the bar.
+
+       Top and bottom are kept equal so the flex centering actually lands the
+       text block in the optical middle. An asymmetric pair (the nav height plus
+       a larger top value) sinks the group visibly below center. The scroll cue
+       is absolutely positioned, so it needs no padding reserved for it. */
     .hero-home {
-      padding: 100px 0 80px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 100svh;
+      padding: calc(var(--nav-height) + 40px) 0 calc(var(--nav-height) + 40px);
       text-align: center;
-      background: linear-gradient(180deg, var(--color-bg-alt) 0%, var(--color-bg) 100%);
+      background-color: var(--color-bg-alt);
+      overflow: hidden;
     }
+    /* The ::before photo layer lives in css/styles.css, NOT here: a url() inside
+       an inline <style> breaks Vite's html-inline-proxy at build time. */
+    .hero-home::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      /* Two layers. The radial is centered on the text block and does the real
+         contrast work, so the muted-grey subtitle clears 4.5:1 where it crosses
+         lit skin and denim; the flat layer underneath is a light, even knock-down
+         that keeps the corners of the photo from blowing out.
+
+         Deliberately NOT a vertical fade to the page background: that version
+         left the bottom third looking like dead black space. */
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 50%,
+          rgba(18, 18, 20, 0.72) 0%,
+          rgba(18, 18, 20, 0.5) 55%,
+          rgba(18, 18, 20, 0) 100%),
+        rgba(18, 18, 20, 0.35);
+    }
+    .hero-home > .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      /* Backstop for the scrim: a photo can always put a highlight directly
+         behind a glyph, and a soft shadow is invisible against the dark image
+         while guaranteeing an edge everywhere. */
+      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
+    }
+    /* Scroll cue. A full-height hero can read as the entire page, so this marks
+       that there's more below. Chevron is a rotated square with two borders. */
+    .scroll-cue {
+      position: absolute;
+      z-index: 1;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      opacity: 0.7;
+      transition: opacity 0.2s ease, color 0.2s ease;
+      animation: scroll-cue-bob 2.4s ease-in-out infinite;
+    }
+    .scroll-cue:hover {
+      opacity: 1;
+      color: var(--color-white);
+    }
+    .scroll-cue::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: translateY(-25%) rotate(45deg);
+    }
+    @keyframes scroll-cue-bob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+    /* Motion here is decorative, so drop it entirely when motion is unwelcome. */
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-cue { animation: none; }
+    }
+    /* Scales with the viewport now that the hero is full-height, so the heading
+       doesn't look lost in the middle of a large screen. */
     .hero-home h1 {
-      font-size: 3rem;
-      margin-bottom: 12px;
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      margin-bottom: 20px;
     }
     .hero-tagline {
       font-size: 0.8rem;
@@ -26,7 +113,7 @@
       text-transform: uppercase;
       letter-spacing: 0.14em;
       color: var(--color-accent);
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       /* One line with a bullet on desktop, two lines with no bullet on mobile.
          CSS can't detect that text has wrapped, so the layout switch and the
          bullet's visibility are driven by the SAME breakpoint below. They must
@@ -52,19 +139,26 @@
         display: block;
       }
     }
+    /* Lighter than the usual --color-text-muted (#999): over a photo that grey
+       lands near 2.5:1 where it crosses lit skin and denim, well under the 4.5:1
+       needed for body text. On a flat background it would be fine. */
     .hero-home .subtitle {
       font-size: 1.25rem;
-      color: var(--color-text-muted);
+      color: #d4d4d4;
       max-width: 600px;
-      margin: 0 auto 32px;
+      margin: 0 auto 40px;
       line-height: 1.7;
+    }
+    /* Buttons have their own solid/outlined backgrounds, so the inherited
+       text-shadow just muddies their labels. */
+    .hero-ctas .btn {
+      text-shadow: none;
     }
     .hero-ctas {
       display: flex;
       gap: 16px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 40px;
     }
     .listen-grid {
       display: grid;
@@ -149,13 +243,18 @@
       margin-bottom: 0;
     }
     @media (max-width: 768px) {
-      .hero-home { padding: 60px 0 48px; }
+      /* Shorter on phones: 82svh of a tall narrow screen is a lot of empty space
+         above the fold, and the CTAs matter more than the photo here. */
+      .hero-home {
+        min-height: 70svh;
+        padding: calc(var(--nav-height) + 48px) 0 48px;
+      }
       .hero-home h1 { font-size: 2.2rem; }
       .hero-home .subtitle { font-size: 1.05rem; }
     }
   </style>
 </head>
-<body>
+<body class="has-hero-photo">
 
   <%- include('partials/nav.ejs', { data, activePage: 'home' }) %>
 
@@ -170,20 +269,18 @@
           <span>Music from the Collective</span> <span class="tagline-sep">&bull;</span> <span>Worship from the heart</span>
         </p>
         <p class="subtitle">We're a collective of songwriters, singers, and musicians with one driving passion: to encourage and equip the church to worship God.</p>
+        <%# Social links deliberately omitted here — they're in the footer, and in
+            the hero they competed with the CTAs and sent people off-site. %>
         <div class="hero-ctas">
           <a href="music.html" class="btn btn-primary">Explore Our Music</a>
           <a href="story.html" class="btn btn-outline">Our Story</a>
         </div>
-        <div class="social-links" style="justify-content: center;">
-          <% data.site.socials.forEach(function(s) { %>
-          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><img src="images/icons/<%= s.icon %>.svg" width="24" height="24" alt=""></a>
-          <% }); %>
-        </div>
       </div>
+      <a href="#recent-work" class="scroll-cue" aria-label="Scroll to recent work"></a>
     </section>
 
     <!-- Recent Work -->
-    <section class="section section-alt">
+    <section class="section section-alt" id="recent-work">
       <div class="container">
         <div class="section-header">
           <h2>Recent Work</h2>
@@ -274,6 +371,28 @@
   </main>
 
   <%- include('partials/footer.ejs', { data }) %>
+
+  <script>
+    // Solidify the nav once the hero photo has scrolled far enough behind it.
+    // 80px, just past --nav-height, so the swap reads as intentional rather
+    // than firing on a stray one-pixel scroll.
+    (function () {
+      var nav = document.querySelector('.site-nav');
+      if (!nav) return;
+      var ticking = false;
+      function update() {
+        nav.classList.toggle('scrolled', window.scrollY > 80);
+        ticking = false;
+      }
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(update);
+        }
+      }, { passive: true });
+      update(); // reloading mid-page shouldn't start transparent
+    })();
+  </script>
 
 </body>
 </html>
