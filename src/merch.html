@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head.ejs', {
+    data,
+    title: 'Merch | Clay Collective Music',
+    description: 'Clay Collective merch, at cost. We take no cut — every order goes straight to our print partner.',
+    keywords: 'Clay Collective, merch, worship apparel, shirts',
+    ogTitle: 'Merch | Clay Collective Music',
+    ogDescription: 'Clay Collective merch, at cost. We take no cut.',
+    canonical: 'merch.html'
+  }) %>
+  <style>
+    .merch-section {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    /* The "we take no cut" line is the whole reason this page exists —
+       give it visual weight without turning it into a shouty callout. */
+    .merch-lede {
+      color: var(--color-text);
+      font-size: 1.2rem;
+      line-height: 1.75;
+    }
+    .merch-cta {
+      margin-top: 36px;
+    }
+    .merch-cta .btn {
+      padding: 14px 32px;
+      font-size: 1rem;
+    }
+    .merch-note {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <%- include('partials/nav.ejs', { data, activePage: 'merch' }) %>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Merch</h1>
+        <div class="accent-line"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="merch-section">
+          <p class="merch-lede">Grab some merch at the link below! We're not looking to make money off this, you only pay for printing and shipping.</p>
+
+          <div class="merch-cta">
+            <a href="<%= data.site.merchUrl %>" target="_blank" rel="noopener" class="btn btn-primary">Shop Merch
+              &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer.ejs', { data }) %>
+
+</body>
+</html>

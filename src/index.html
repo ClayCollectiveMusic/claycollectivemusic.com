@@ -1,49 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClayCollectiveMusic</title>
-    <style>
-      html,
-      body {
-        padding: 0;
-        margin: 0;
-        background-color: #ee2c8a;
-        width: 100%;
-        height: 100%;
-        background-repeat: repeat;
-        background-image: url(public/bg.png);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+<head>
+  <%- include('partials/head.ejs', {
+    data,
+    title: 'Clay Collective Music | Worship Music from Central PA',
+    description: 'Clay Collective is a worship collective from Central PA writing original songs for the local church. Stream our catalog, download MP3s and stems, and use them with your worship team at no charge.',
+    keywords: 'Clay Collective, worship music, worship stems, multitrack, church music, Central PA worship',
+    ogTitle: 'Clay Collective Music',
+    ogDescription: 'A worship collective from Central PA writing original songs for the local church.',
+    canonical: ''
+  }) %>
+  <style>
+    /* Full viewport height so the photo fills the screen edge to edge, which is
+       the whole point of the transparent nav above it. min-height (not height)
+       lets it grow if the content ever needs more room. svh, not vh, so mobile
+       browser chrome collapsing doesn't cause a jump.
+
+       Top padding includes --nav-height: the nav is fixed on this page (see
+       body.has-hero-photo in styles.css), so the photo runs to the top of the
+       viewport behind it while the text still clears the bar.
+
+       Top and bottom are kept equal so the flex centering actually lands the
+       text block in the optical middle. An asymmetric pair (the nav height plus
+       a larger top value) sinks the group visibly below center. The scroll cue
+       is absolutely positioned, so it needs no padding reserved for it. */
+    .hero-home {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 100svh;
+      padding: calc(var(--nav-height) + 40px) 0 calc(var(--nav-height) + 40px);
+      text-align: center;
+      background-color: var(--color-bg-alt);
+      overflow: hidden;
+    }
+    /* The ::before photo layer lives in css/styles.css, NOT here: a url() inside
+       an inline <style> breaks Vite's html-inline-proxy at build time. */
+    .hero-home::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      /* Two layers. The radial is centered on the text block and does the real
+         contrast work, so the muted-grey subtitle clears 4.5:1 where it crosses
+         lit skin and denim; the flat layer underneath is a light, even knock-down
+         that keeps the corners of the photo from blowing out.
+
+         Deliberately NOT a vertical fade to the page background: that version
+         left the bottom third looking like dead black space. */
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 50%,
+          rgba(18, 18, 20, 0.72) 0%,
+          rgba(18, 18, 20, 0.5) 55%,
+          rgba(18, 18, 20, 0) 100%),
+        rgba(18, 18, 20, 0.35);
+    }
+    .hero-home > .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      /* Backstop for the scrim: a photo can always put a highlight directly
+         behind a glyph, and a soft shadow is invisible against the dark image
+         while guaranteeing an edge everywhere. */
+      text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
+    }
+    /* Scroll cue. A full-height hero can read as the entire page, so this marks
+       that there's more below. Chevron is a rotated square with two borders. */
+    .scroll-cue {
+      position: absolute;
+      z-index: 1;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      opacity: 0.7;
+      transition: opacity 0.2s ease, color 0.2s ease;
+      animation: scroll-cue-bob 2.4s ease-in-out infinite;
+    }
+    .scroll-cue:hover {
+      opacity: 1;
+      color: var(--color-white);
+    }
+    .scroll-cue::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: translateY(-25%) rotate(45deg);
+    }
+    @keyframes scroll-cue-bob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+    /* Motion here is decorative, so drop it entirely when motion is unwelcome. */
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-cue { animation: none; }
+    }
+    /* Scales with the viewport now that the hero is full-height, so the heading
+       doesn't look lost in the middle of a large screen. */
+    .hero-home h1 {
+      font-size: clamp(3rem, 6vw, 4.5rem);
+      margin-bottom: 20px;
+    }
+    .hero-tagline {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--color-accent);
+      margin-bottom: 32px;
+      /* One line with a bullet on desktop, two lines with no bullet on mobile.
+         CSS can't detect that text has wrapped, so the layout switch and the
+         bullet's visibility are driven by the SAME breakpoint below. They must
+         stay in sync: if the text wraps on its own while the bullet is still
+         showing, the bullet strands at a line edge. Hence nowrap halves plus an
+         explicit stack, rather than relying on natural wrapping. */
+      line-height: 1.6;
+    }
+    .hero-tagline span {
+      white-space: nowrap;
+    }
+    .hero-tagline .tagline-sep {
+      opacity: 0.6;
+    }
+    /* 700px, not the site's usual 768px: the two phrases at this size and
+       letter-spacing run out of room around 490px inside .container, so the
+       switch has to happen comfortably before natural wrapping would kick in. */
+    @media (max-width: 700px) {
+      .hero-tagline .tagline-sep {
+        display: none;
       }
-      #merch {
-        position: fixed;
-        top: 16px;
-        right: 20px;
-        color: white;
-        font-family: sans-serif;
-        font-size: 14px;
-        font-weight: bold;
-        text-decoration: none;
-        letter-spacing: 0.05em;
-        text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      .hero-tagline span {
+        display: block;
       }
-      #merch:hover {
-        text-decoration: underline;
+    }
+    /* Lighter than the usual --color-text-muted (#999): over a photo that grey
+       lands near 2.5:1 where it crosses lit skin and denim, well under the 4.5:1
+       needed for body text. On a flat background it would be fine. */
+    .hero-home .subtitle {
+      font-size: 1.25rem;
+      color: #d4d4d4;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    /* Buttons have their own solid/outlined backgrounds, so the inherited
+       text-shadow just muddies their labels. */
+    .hero-ctas .btn {
+      text-shadow: none;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .listen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .listen-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      color: var(--color-text);
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+    .listen-card:hover {
+      border-color: var(--color-accent);
+      color: var(--color-white);
+      transform: translateY(-1px);
+    }
+    .listen-card svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+    .listen-card span {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .recent-work-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .work-card {
+      display: block;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      /* Padding lives on .work-card-body so the album art can run edge to edge. */
+      overflow: hidden;
+      color: var(--color-text);
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+    .work-card:hover {
+      border-color: var(--color-accent);
+      transform: translateY(-2px);
+    }
+    /* Square — album covers are 1:1. Reserved up front so art loading can't shift layout. */
+    .work-card-art {
+      aspect-ratio: 1 / 1;
+      background-color: var(--color-bg);
+    }
+    .work-card-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .work-card-body {
+      padding: 24px 28px 28px;
+    }
+    .work-card .work-label {
+      color: var(--color-accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .work-card h3 {
+      margin-bottom: 12px;
+    }
+    .work-card p {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 0;
+    }
+    @media (max-width: 768px) {
+      /* Shorter on phones: 82svh of a tall narrow screen is a lot of empty space
+         above the fold, and the CTAs matter more than the photo here. */
+      .hero-home {
+        min-height: 70svh;
+        padding: calc(var(--nav-height) + 48px) 0 48px;
       }
-      img {
-        max-width: 100vw;
-        max-height: 100vh;
-        width: auto;
-        height: auto;
-        object-fit: contain;
+      .hero-home h1 { font-size: 2.2rem; }
+      .hero-home .subtitle { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body class="has-hero-photo">
+
+  <%- include('partials/nav.ejs', { data, activePage: 'home' }) %>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero-home">
+      <div class="container">
+        <h1>Clay Collective Music</h1>
+        <!-- One line with the bullet above 700px, two lines without it below.
+             Both halves of that switch live in the media query in <style> above. -->
+        <p class="hero-tagline">
+          <span>Music from the Collective</span> <span class="tagline-sep">&bull;</span> <span>Worship from the heart</span>
+        </p>
+        <p class="subtitle">We're a collective of songwriters, singers, and musicians with one driving passion: to encourage and equip the church to worship God.</p>
+        <%# Social links deliberately omitted here — they're in the footer, and in
+            the hero they competed with the CTAs and sent people off-site. %>
+        <div class="hero-ctas">
+          <a href="music.html" class="btn btn-primary">Explore Our Music</a>
+          <a href="story.html" class="btn btn-outline">Our Story</a>
+        </div>
+      </div>
+      <a href="#recent-work" class="scroll-cue" aria-label="Scroll to recent work"></a>
+    </section>
+
+    <!-- Recent Work -->
+    <section class="section section-alt" id="recent-work">
+      <div class="container">
+        <div class="section-header">
+          <h2>Recent Work</h2>
+          <div class="accent-line"></div>
+        </div>
+        <%
+          // Blurbs are hand-written; art/year come from the media scan so they can't drift.
+          const recentWork = [
+            { slug: 'king-of-glory', blurb: 'Our latest release, a powerful proclamation of Jesus the coming King.' },
+            { slug: 'receive-your-glory', blurb: 'Years in the making, our first self-produced release centers on exalting the only One truly worthy of honor.' },
+            { slug: 'pour-out-your-spirit', blurb: 'These songs cry out for a fresh move of the Holy Spirit, kingdom harvest, and unending praise.' },
+          ];
+        %>
+        <div class="recent-work-grid">
+          <% recentWork.forEach(function(work) { %>
+            <% const album = data.albums.find(function(a) { return a.slug === work.slug; }); %>
+            <% if (album) { %>
+              <a href="music.html#<%= album.slug %>" class="work-card">
+                <% if (album.artUrl) { %>
+                  <div class="work-card-art">
+                    <img src="<%= album.artUrl %>" alt="<%= album.name %> album art" loading="lazy" />
+                  </div>
+                <% } %>
+                <div class="work-card-body">
+                  <div class="work-label"><%= album.year %></div>
+                  <h3><%= album.name %></h3>
+                  <p><%= work.blurb %></p>
+                </div>
+              </a>
+            <% } %>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+
+    <!-- What We Offer -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Resources for Your Worship Team</h2>
+          <p>Freely available to anyone who can use them</p>
+          <div class="accent-line"></div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-body">
+              <h3>Songs &amp; Downloads</h3>
+              <p>Every song in our catalog, streaming right on the page, with MP3 downloads for your team. Chord charts are on the way.</p>
+              <a href="music.html" class="btn btn-outline btn-sm">Browse Catalog</a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3>Stems &amp; Multitrack Player</h3>
+              <p>Preview every stem in our browser player, solo and mute individual parts to hear how they fit, then download the ones your team needs. Handy for rehearsing or running tracks live.</p>
+              <a href="player.html" class="btn btn-outline btn-sm">Open Player</a>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h3>Merch</h3>
+              <p>T-shirts, hats, and more. We take no cut, so you pay only for printing and shipping.</p>
+              <a href="merch.html" class="btn btn-outline btn-sm">Shop Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Listen Now -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Listen Now</h2>
+          <p>Our music is available on all major platforms. Pick your favorite and press play.</p>
+          <div class="accent-line"></div>
+        </div>
+        <div class="listen-grid">
+          <% data.site.listen.forEach(function(l) { %>
+          <a href="<%= l.url %>" target="_blank" rel="noopener" class="listen-card">
+            <img src="images/icons/<%= l.icon %>.svg" width="24" height="24" alt="">
+            <span><%= l.name %></span>
+          </a>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer.ejs', { data }) %>
+
+  <script>
+    // Solidify the nav once the hero photo has scrolled far enough behind it.
+    // 80px, just past --nav-height, so the swap reads as intentional rather
+    // than firing on a stray one-pixel scroll.
+    (function () {
+      var nav = document.querySelector('.site-nav');
+      if (!nav) return;
+      var ticking = false;
+      function update() {
+        nav.classList.toggle('scrolled', window.scrollY > 80);
+        ticking = false;
       }
-    </style>
-  </head>
-  <body>
-    <a id="merch" href="https://shop.tbsonlinestore.com/product-category/clay-collective/" target="_blank">MERCH</a>
-    <img src="public/coming-soon.png" />
-  </body>
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(update);
+        }
+      }, { passive: true });
+      update(); // reloading mid-page shouldn't start transparent
+    })();
+  </script>
+
+</body>
 </html>

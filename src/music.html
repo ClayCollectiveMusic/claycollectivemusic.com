@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <%- include('partials/head.ejs', {
+      data,
+      title: 'Music | Clay Collective Music',
+      description: 'Browse the Clay Collective catalog. Stream full tracks and download free MP3s and stems of our original worship songs.',
+      keywords: 'Clay Collective, worship songs, MP3 download, worship stems, worship music catalog',
+      ogTitle: 'Music | Clay Collective Music',
+      ogDescription: 'Browse our catalog. Stream full tracks and download free MP3s and stems.',
+      canonical: 'music.html'
+      }) %>
+</head>
+
+<body>
+
+  <%- include('partials/nav.ejs', { data, activePage: 'music' }) %>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <h1>Music</h1>
+          <p class="subtitle">Check out our songs below, where you can download MP3s, chord charts, and stems. You can also <a href="player.html">browse every song's stems in one place</a>.</p>
+        </div>
+      </section>
+
+      <% data.albums.forEach(function(album) { %>
+        <section class="section" id="<%= album.slug %>">
+          <div class="container">
+            <div class="album-card">
+              <% if (album.artUrl) { %>
+                <div class="album-art">
+                  <img src="<%= album.artUrl %>" alt="<%= album.name %> album art" />
+                </div>
+                <% } %>
+                  <div class="album-info">
+                    <div class="album-header">
+                      <h2>
+                        <%= album.name %>
+                      </h2>
+                      <span class="album-year">
+                        <%= album.year %>
+                      </span>
+                    </div>
+
+                    <div class="album-tracks">
+                      <% album.tracks.forEach(function(track) { %>
+                        <div class="album-track-row" data-mp3="<%= track.mp3Url %>" <% if (track.masterUrl) { %>
+                          data-master-url="<%= track.masterUrl %>"<% } %>>
+                              <div class="album-track-top">
+                                <button class="music-play-btn" aria-label="Play" title="Play">
+                                  <svg class="icon-play" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M8 5v14l11-7z" />
+                                  </svg>
+                                  <svg class="icon-pause" viewBox="0 0 24 24" width="16" height="16"
+                                       fill="currentColor">
+                                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                                  </svg>
+                                </button>
+                                <span class="album-track-num">
+                                  <%= String(track.num).padStart(2, '0' ) %>
+                                </span>
+                                <span class="album-track-name">
+                                  <%= track.name %>
+                                </span>
+                                <div class="album-track-actions">
+                                  <% if (track.stems.length> 0) { %>
+                                    <a href="player.html?song=<%= album.slug %>--<%= track.slug %>"
+                                       class="track-action-btn" title="Stem Player">
+                                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                        <path
+                                              d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm-8-8h2v-4H3v4zm12 4h2V6h-2v12zm4-8v4h2v-4h-2z" />
+                                      </svg>
+                                    </a>
+                                    <% } %>
+                                  <% if (track.spotifyUrl || track.youtubeUrl || track.appleMusicUrl || track.amazonMusicUrl) { %>
+                                    <div class="track-menu">
+                                      <button type="button" class="track-action-btn track-menu-btn"
+                                              title="Listen" aria-label="Listen" aria-haspopup="true" aria-expanded="false">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                          <path d="M12 3a9 9 0 0 0-9 9v5a3 3 0 0 0 3 3h2v-8H5v0a7 7 0 0 1 14 0v0h-3v8h2a3 3 0 0 0 3-3v-5a9 9 0 0 0-9-9z" />
+                                        </svg>
+                                      </button>
+                                      <div class="track-menu-list" role="menu">
+                                        <% if (track.spotifyUrl) { %>
+                                          <a href="<%= track.spotifyUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/spotify.svg" width="16" height="16" alt="">Spotify</a>
+                                          <% } %>
+                                        <% if (track.youtubeUrl) { %>
+                                          <a href="<%= track.youtubeUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/youtube.svg" width="16" height="16" alt="">YouTube</a>
+                                          <% } %>
+                                        <% if (track.appleMusicUrl) { %>
+                                          <a href="<%= track.appleMusicUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/apple-music.svg" width="16" height="16" alt="">Apple Music</a>
+                                          <% } %>
+                                        <% if (track.amazonMusicUrl) { %>
+                                          <a href="<%= track.amazonMusicUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                            <img src="images/icons/amazon-music.svg" width="16" height="16" alt="">Amazon Music</a>
+                                          <% } %>
+                                      </div>
+                                    </div>
+                                    <% } %>
+                                  <div class="track-menu">
+                                    <button type="button" class="track-action-btn track-menu-btn"
+                                            title="Download" aria-label="Download" aria-haspopup="true" aria-expanded="false">
+                                      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
+                                      </svg>
+                                    </button>
+                                    <div class="track-menu-list" role="menu">
+                                      <a href="<%= track.mp3Url %>" download role="menuitem">
+                                        <span class="file-tag">.mp3</span>Download mp3</a>
+                                      <% if (track.masterUrl) { %>
+                                        <a href="<%= track.masterUrl %>" target="_blank" rel="noopener" role="menuitem">
+                                          <span class="file-tag">.wav</span>Download master</a>
+                                        <% } %>
+                                      <% if (track.stemsLink) { %>
+                                        <a href="<%= track.stemsLink %>" target="_blank" rel="noopener" role="menuitem">
+                                          <span class="file-tag">.zip</span>Download stems</a>
+                                        <% } %>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="music-progress-bar">
+                                <% if (track.waveformUrl) { %>
+                                  <%
+                                    /* Prerendered waveform, used as a CSS mask so the color is
+                                       controlled by the stylesheet. Two layers: the dim unplayed
+                                       base and the bright played portion, revealed via clip-path.
+                                       Rasterizes once — progress never redraws it. */
+                                    var wfMask = "url('" + track.waveformUrl + "')";
+                                  %>
+                                  <div class="music-waveform" data-waveform
+                                       style="-webkit-mask-image: <%= wfMask %>; mask-image: <%= wfMask %>"></div>
+                                  <div class="music-waveform-played" data-waveform-played
+                                       style="-webkit-mask-image: <%= wfMask %>; mask-image: <%= wfMask %>"></div>
+                                  <% } %>
+                                <div class="music-progress-fill"></div>
+                              </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                  </div>
+            </div>
+          </div>
+        </section>
+        <% }); %>
+
+          <% if (data.albums.length===0) { %>
+            <section class="section">
+              <div class="container text-center">
+                <p class="text-muted">No music available yet. Check back soon!</p>
+              </div>
+            </section>
+            <% } %>
+    </main>
+
+    <%- include('partials/footer.ejs', { data }) %>
+
+      <script type="module" src="/js/music-player.js"></script>
+</body>
+
+</html>

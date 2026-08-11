@@ -1,2 +1,7 @@
-dist
-node_modules*
+node_modules/
+dist/
+src/media/**
+!src/media/
+!src/media/*/
+!src/media/**/album.json
+.env.local

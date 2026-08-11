@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head.ejs', {
+    data,
+    title: 'Stems & Multitrack Player | Clay Collective Music',
+    description: 'Play every stem of a Clay Collective song right in your browser. Solo and mute individual parts to hear how they fit, then download the stems your team needs.',
+    keywords: 'Clay Collective, stem downloads, multitrack player, worship stems, isolated tracks',
+    ogTitle: 'Stems & Multitrack Player | Clay Collective Music',
+    ogDescription: 'Play every stem in your browser. Solo, mute, and download individual tracks.',
+    canonical: 'player.html'
+  }) %>
+</head>
+<body>
+
+  <%- include('partials/nav.ejs', { data, activePage: 'player' }) %>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Stems &amp; Multitrack Player</h1>
+        <p class="subtitle">Pick a song to load every stem into the player. Solo or mute individual parts to hear how they fit together, then download the ones your team needs.</p>
+        <div class="accent-line"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+
+        <div class="song-list" id="song-list"></div>
+
+        <!-- Player -->
+        <div class="player-container" id="player" style="display: none;">
+
+          <!-- Transport bar -->
+          <div class="player-transport">
+            <button class="daw-play-btn" id="play-btn" aria-label="Play/Pause">
+              <svg class="icon-play" viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <svg class="icon-pause" viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+              <svg class="icon-loading" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <circle cx="12" cy="12" r="9" stroke-opacity="0.25"/>
+                <path d="M12 3a9 9 0 0 1 9 9"/>
+              </svg>
+            </button>
+            <span class="player-time" id="time-display">0:00 / 0:00</span>
+            <span class="transport-size-warning" id="transport-size-warning" style="display:none;"></span>
+            <div class="transport-progress" id="overall-progress-wrap" style="display:none;">
+              <div class="player-progress-bar">
+                <div class="player-progress-fill" id="overall-progress-fill"></div>
+              </div>
+              <div class="player-progress-label" id="overall-progress-label">Loading stems&hellip;</div>
+            </div>
+            <div class="download-all-wrapper" id="download-all-wrapper" style="display: none;">
+              <a href="#" class="btn btn-primary btn-sm" id="download-all-btn" target="_blank">Download All Stems
+                (.zip)</a>
+            </div>
+          </div>
+
+          <!-- Waveform area (tracks + playhead) -->
+          <div class="daw-waveform-area" id="waveform-area">
+            <div class="daw-playhead" id="playhead"></div>
+            <div class="daw-playhead-time" id="playhead-time">0:00</div>
+            <div class="track-list" id="track-list"></div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer.ejs', { data }) %>
+
+  <script>var PLAYER_SONGS = <%- JSON.stringify(data.generatePlayerData(data.albums)) %>;</script>
+  <script type="module" src="/js/player.js"></script>
+</body>
+</html>

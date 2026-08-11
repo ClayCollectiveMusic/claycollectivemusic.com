@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head.ejs', {
+    data,
+    title: 'Our Story | Clay Collective Music',
+    description: 'How a desire to write songs for the local church grew into a worship collective serving congregations across Central PA. The story of Clay Collective.',
+    keywords: 'Clay Collective, our story, worship collective, Central PA worship, history',
+    ogTitle: 'Our Story | Clay Collective Music',
+    ogDescription: 'How a desire to write songs for the local church grew into a collective serving congregations across Central PA.',
+    canonical: 'story.html'
+  }) %>
+  <style>
+    .story-section {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .story-section p {
+      color: var(--color-text);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .story-section p:last-child {
+      margin-bottom: 0;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+      margin-top: 40px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background-color: var(--color-border);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 36px;
+    }
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -32px;
+      top: 6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: var(--color-accent);
+      border: 3px solid var(--color-bg);
+    }
+    .timeline-item .timeline-date {
+      color: var(--color-accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .timeline-item h3 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+    }
+    .timeline-item p {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <%- include('partials/nav.ejs', { data, activePage: 'story' }) %>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Our Story</h1>
+        <div class="accent-line"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="story-section">
+          <p>Clay Collective started with a simple idea: write songs for this season, for the local church. The name comes from the picture of jars of clay, ordinary people carrying something far greater than themselves.</p>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">The Beginning</div>
+              <h3>Songs From Our Own Church</h3>
+              <p>It began with friends who loved to worship and wanted to write songs their church could sing together. Some of it came out of prayer rooms and weekend gatherings, and some came from songwriters around the region who brought us songs they had already written. Those songs became <em>Living Stones</em>, our first album, and the foundation for everything that followed.</p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">A New Chapter</div>
+              <h3>Sharpening the Focus</h3>
+              <p>After <em>Living Stones</em>, we leaned further into congregational worship: songs a whole room can sing together on a Sunday morning. We started paying closer attention to the things that make that work. Melodies that sit in a range most people can reach, structures simple enough to join in on the first hearing, and words with real theological weight. That focus shapes every song we write now.</p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">Sharing the Work</div>
+              <h3>Free Music, Free Stems</h3>
+              <p>Everything we make is free to download: the recordings, the multitrack stems, and the tools to learn a song from the ground up. A team with a full band and a team with one guitar should both be able to lead these songs well.</p>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-date">Where We Are Now</div>
+              <h3>A Worship Community Across Central PA</h3>
+              <p>Clay Collective has always been bigger than one church or one band. Musicians, vocalists, and worship leaders from congregations across Central PA write with us, lead with us, and play on the records. </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer.ejs', { data }) %>
+
+</body>
+</html>

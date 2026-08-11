@@ -1,20 +1,26 @@
 {
   "name": "claycollectivemusic.com",
-  "version": "1.0.0",
-  "description": "The website for ClayCollectiveMusic.com",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "build": "cp -r src/. dist"
+    "dev": "vite --host",
+    "start": "vite --host",
+    "build": "vite build",
+    "media": "npm run media:process && npm run media:upload",
+    "media:download": "tsx scripts/sync-r2.ts --pull",
+    "media:process": "tsx scripts/process-media.ts",
+    "media:upload": "tsx scripts/sync-r2.ts --push --prune",
+    "media:upload:dry-run": "tsx scripts/sync-r2.ts --push --prune --dry-run"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ClayCollectiveMusic/claycollectivemusic.com.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ClayCollectiveMusic/claycollectivemusic.com/issues"
-  },
-  "homepage": "https://github.com/ClayCollectiveMusic/claycollectivemusic.com#readme"
+  "devDependencies": {
+    "@aws-sdk/client-s3": "^3.967.0",
+    "@aws-sdk/lib-storage": "^3.967.0",
+    "@types/node": "^25.3.5",
+    "ejs": "^3.1.10",
+    "fast-glob": "^3.3.3",
+    "glob-all": "^3.3.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^6.3.5",
+    "vite-plugin-ejs": "^1.7.0"
+  }
 }

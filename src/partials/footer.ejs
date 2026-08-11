@@ -1,0 +1,42 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Clay Collective</h3>
+        <p><%= data.site.tagline %></p>
+        <div class="social-links footer-socials">
+          <% data.site.socials.forEach(function(s) { %>
+          <a href="<%= s.url %>" target="_blank" rel="noopener" aria-label="<%= s.name %>"><img src="images/icons/<%= s.icon %>.svg" width="18" height="18" alt=""></a>
+          <% }); %>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-links-group">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="music.html">Music</a></li>
+            <li><a href="player.html">Stems &amp; Player</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>More</h4>
+          <ul>
+            <li><a href="story.html">Our Story</a></li>
+            <li><a href="merch.html">Merch</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>Listen</h4>
+          <ul>
+            <% data.site.listen.forEach(function(l) { %>
+            <li><a href="<%= l.url %>" target="_blank" rel="noopener"><%= l.name %></a></li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <%= new Date().getFullYear() %> <%= data.site.copyright %>
+    </div>
+  </div>
+</footer>
